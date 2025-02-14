@@ -1,65 +1,92 @@
-import flet as ft
-import requests
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlitzStats - Статистика игроков</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 30px;
+            font-weight: bold;
+        }
+        input {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
 
-YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071"  # Замените на ваш API ключ
+    <h1>Поиск игрока</h1>
+    <input type="text" id="nickname" placeholder="Введите никнейм или ID">
+    <button id="searchButton">Поиск</button>
+    <div class="result" id="resultLabel"></div>
 
-def main(page: ft.Page):
-    page.title = "BlitzStats - Статистика игроков"
-    page.vertical_alignment = ft.MainAxisAlignment.START
-    page.theme_mode = ft.ThemeMode.LIGHT
+    <script>
+        const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071"; // Замените на ваш API ключ
 
-    # Заголовок
-    title = ft.Text("Поиск игрока", size=30, weight=ft.FontWeight.BOLD)
-    page.add(title)
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const nickname = document.getElementById('nickname').value;
+            getPlayerStats(nickname);
+        });
 
-    # Ввод никнейма
-    nickname_input = ft.TextField(label="Введите никнейм или ID", width=300)
-    page.add(nickname_input)
+        function getPlayerStats(nickname) {
+            if (!nickname) {
+                alert("Пожалуйста, введите никнейм или ID.");
+                return;
+            }
 
-    # Кнопка поиска
-    search_button = ft.ElevatedButton("Поиск", on_click=lambda e: get_player_stats(nickname_input.value, page))
-    page.add(search_button)
+            const url = `https://papi.tanksblitz.ru/wotb/account/list/?application_id=${YOUR_API_KEY}&search=${nickname}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Ошибка сети");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.data && data.data.length > 0) {
+                        const playerInfo = data.data[0];
+                        const accountId = playerInfo.account_id;
+                        getPlayerStatistics(accountId);
+                    } else {
+                        alert("Игрок не найден.");
+                    }
+                })
+                .catch(error => {
+                    alert(`Ошибка: ${error.message}`);
+                });
+        }
 
-    # Результаты
-    global result_label
-    result_label = ft.Text("", size=20)
-    page.add(result_label)
+        function getPlayerStatistics(accountId) {
+            const url = `https://papi.tanksblitz.ru/wotb/account/info/?application_id=${YOUR_API_KEY}&fields=statistics&account_id=${accountId}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const stats = data.data[accountId].statistics.all;
+                    const battles = stats.battles;
+                    const wins = stats.wins;
+                    const winRate = (wins / battles * 100) || 0;
+                    const averageDamage = (stats.damage_dealt / battles) || 0;
 
-def get_player_stats(nickname, page):
-    if not nickname:
-        ft.SnackBar("Пожалуйста, введите никнейм или ID.").show()
-        return
+                    const resultText = `Бои: ${battles}<br>Победы: ${wins}<br>Процент побед: ${winRate.toFixed(2)}%<br>Средний урон: ${averageDamage.toFixed(2)}`;
+                    document.getElementById('resultLabel').innerHTML = resultText;
+                });
+        }
+    </script>
 
-    # Получение информации о игроке
-    url = f"https://papi.tanksblitz.ru/wotb/account/list/?application_id={YOUR_API_KEY}&search={nickname}"  # Замените на нужный URL
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        if data['data']:
-            player_info = data['data'][0]
-            account_id = player_info['account_id']
-            stats = get_player_statistics(account_id)
-
-            # Отображение статистики
-            battles = stats['statistics']['all']['battles']
-            wins = stats['statistics']['all']['wins']
-            win_rate = (wins / battles * 100) if battles > 0 else 0
-            average_damage = stats['statistics']['all']['damage_dealt'] / battles if battles > 0 else 0
-
-            result_text = f"Бои: {battles}\nПобеды: {wins}\nПроцент побед: {win_rate:.2f}%\nСредний урон: {average_damage:.2f}"
-            result_label.value = result_text  # Обновление текста результата
-            page.update()
-        else:
-            ft.SnackBar("Игрок не найден.").show()
-    except requests.exceptions.RequestException as e:
-        ft.SnackBar(f"Ошибка: {e}").show()
-
-def get_player_statistics(account_id):
-    url = f"https://papi.tanksblitz.ru/wotb/account/info/?application_id={YOUR_API_KEY}&fields=statistics&account_id={account_id}"  # Замените на нужный URL
-    response = requests.get(url)
-    data = response.json()
-    return data['data'][str(account_id)]
-
-# Запуск приложения в браузере
-ft.app(target=main, view=ft.WEB_BROWSER)
+</body>
+</html>
