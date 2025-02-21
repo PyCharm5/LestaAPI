@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -35,6 +34,7 @@
     <input type="text" id="nickname" placeholder="Введите никнейм или ID">
     <button id="searchButton">Поиск</button>
     <div class="result" id="resultLabel"></div>
+    <h4>© Леста Игры, 2022–2025. Игры «Мир танков», «Мир кораблей», Tanks Blitz основаны на интеллектуальной собственности третьих лиц. Все права на объекты прав третьих лиц принадлежат их законным правообладателям.</h4>
 
     <script>
         const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071"; // Замените на ваш API ключ
