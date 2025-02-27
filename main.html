@@ -12,7 +12,6 @@
         h1 {
             font-size: 30px;
             font-weight: bold;
-            text-align: center;
         }
         input, select {
             width: 300px;
@@ -22,19 +21,10 @@
         button {
             padding: 10px 15px;
             font-size: 16px;
-            background-color: #007bff; /* Синий цвет */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3; /* Темнее при наведении */
         }
         .result {
             margin-top: 20px;
             font-size: 20px;
-            text-align: center;
         }
         .tank-list, .clan-list {
             margin-top: 20px;
@@ -49,9 +39,11 @@
         .tank-info, .clan-info {
             margin-top: 20px;
         }
-        hr {
-            border: 1px solid #ccc;
-            margin: 20px 0;
+        .flag {
+            width: 20px; /* Размер флага */
+            height: auto; /* Автоматическая высота */
+            vertical-align: middle; /* Выравнивание по центру */
+            margin-left: 5px; /* Отступ слева от текста */
         }
     </style>
 </head>
@@ -246,7 +238,7 @@
         const url = `https://papi.tanksblitz.ru/wotb/clans/list/?application_id=${YOUR_API_KEY}&search=${clanSearch}`;
         fetch(url)
             .then(response => {
-                if (!response.ok) {
+                if (! response.ok) {
                     throw new Error("Ошибка сети");
                 }
                 return response.json();
@@ -279,29 +271,20 @@
     function displayClanInfo(clanId) {
         const url = `https://papi.tanksblitz.ru/wotb/clans/info/?application_id=${YOUR_API_KEY}&clan_id=${clanId}`;
         fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Ошибка сети");
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.data && data.data[clanId]) {
-                    const clan = data.data[clanId];
-                    const createdAt = new Date(clan.created_at * 1000).toLocaleDateString(); // Преобразование Unix time в обычный формат
+                const clan = data.data[clanId];
+                const createdAt = new Date(clan.created_at * 1000).toLocaleDateString(); // Преобразование Unix time в обычный формат
 
-                    const clanDetails = `
-                        <h2>${clan.name} (${clan.tag})</h2>
-                        <p>ID клана: ${clanId}</p>
-                        <p>Девиз: ${clan.motto}</p>
-                        <p>Описание: ${clan.description}</p>
-                        <p>Никнейм главы: ${clan.leader_name}</p>
-                        <p>Дата создания: ${createdAt}</p>
-                    `;
-                    document.getElementById('clanInfo').innerHTML = clanDetails;
-                } else {
-                    alert("Данные о клане не найдены.");
-                }
+                const clanDetails = `
+                    <h2>${clan.name} (${clan.tag})</h2>
+                    <p>ID клана: ${clanId}</p>
+                    <p>Девиз: ${clan.motto}</p>
+                    <p>Описание: ${clan.description}</p>
+                    <p>Никнейм главы: ${clan.leader_name}</p>
+                    <p>Дата создания: ${createdAt}</p>
+                `;
+                document.getElementById('clanInfo').innerHTML = clanDetails;
             })
             .catch(error => {
                 alert(`Ошибка: ${error.message}`);
@@ -350,17 +333,6 @@
                 const resultText = `Бои: ${battles}<br>Победы: ${wins}<br>Процент побед: ${winRate.toFixed(2)}%<br>Средний урон: ${averageDamage.toFixed(2)}`;
                 document.getElementById('resultLabel').innerHTML = resultText;
             });
-    }
-
-    function displayPlayerStats(stats) {
-        const resultLabel = document.getElementById('resultLabel');
-        resultLabel.innerHTML = `
-            <h2>${stats.nickname}</h2>
-            <p>Уровень: ${stats.level}</p>
-            <p>Боёв: ${stats.battles}</p>
-            <p>Побед: ${stats.wins}</p>
-            <p>Процент побед: ${((stats.wins / stats.battles) * 100).toFixed(2)}%</p>
-        `;
     }
 </script>
 </body>
