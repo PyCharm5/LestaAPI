@@ -26,18 +26,24 @@
             margin-top: 20px;
             font-size: 20px;
         }
-        .tank-list {
+        .tank-list, .clan-list {
             margin-top: 20px;
         }
-        .tank-item {
+        .tank-item, .clan-item {
             cursor: pointer;
             margin: 5px 0;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        .tank-info {
+        .tank-info, .clan-info {
             margin-top: 20px;
+        }
+        .flag {
+            width: 20px; /* Размер флага */
+            height: auto; /* Автоматическая высота */
+            vertical-align: middle; /* Выравнивание по центру */
+            margin-left: 5px; /* Отступ слева от текста */
         }
     </style>
 </head>
@@ -49,6 +55,7 @@
     <input type="text" id="nickname" placeholder="Введите никнейм или ID">
     <button id="searchButton">Поиск</button>
     <div class="result" id="resultLabel"></div>
+    <hr>
 
     <h1>Поиск танка</h1>
     <select id="nation">
@@ -86,6 +93,13 @@
     <button id="searchTankButton">Поиск танка</button>
     <div class="tank-list" id="tankList"></div>
     <div class="tank-info" id="tankInfo"></div>
+    <hr>
+
+    <h1>Поиск клана</h1>
+    <input type="text" id="clanSearch" placeholder="Введите тег или название клана">
+    <button id="searchClanButton">Поиск клана</button>
+    <div class="clan-list" id="clanList"></div>
+    <div class="clan-info" id="clanInfo"></div>
 </main>
 
 <footer>
@@ -105,6 +119,11 @@
         const tier = document.getElementById('tier').value;
         const type = document.getElementById('type').value;
         searchTank(nation, tier, type);
+    });
+
+    document.getElementById('searchClanButton').addEventListener('click', function() {
+        const clanSearch = document.getElementById('clanSearch').value;
+        searchClan(clanSearch);
     });
 
     function searchTank(nation, tier, type) {
@@ -154,7 +173,7 @@
 
     function displayTankInfo(tank) {
         const tankInfoDiv = document.getElementById('tankInfo');
-        const isPremium = tank.is_premium ? "Да" : "Нет";
+        const isPremium = tank.is_premium ? "Премиум" : "Обычный";
         const firepower = tank.default_profile.firepower;
         const hp = tank.default_profile.hp;
         const speed = tank.default_profile.speed_forward;
@@ -162,12 +181,35 @@
         const dispersion = tank.default_profile.gun.dispersion;
         const reloadTime = tank.default_profile.gun.reload_time;
 
+        // Сокращенные обозначения типов танков
+        const tankTypeMap = {
+            "lightTank": "ЛТ",
+            "mediumTank": "СТ",
+            "heavyTank": "ТТ",
+            "AT-SPG": "ПТ-САУ"
+        };
+        const tankType = tankTypeMap[tank.type] || "Неизвестно";
+
+        // Перевод нации на русский
+        const nationMap = {
+            "ussr": "СССР",
+            "germany": "Германия",
+            "usa": "США",
+            "france": "Франция",
+            "uk": "Великобритания",
+            "china": "Китай",
+            "japan": "Япония",
+            "european": "Сборная Европы",
+            "other": "Сборная нация"
+        };
+        const nation = nationMap[tank.nation] || "Неизвестно";
+
         const tankDetails = `
             <h2>${tank.name} (ID: ${tank.tank_id}) </h2>
             <img src="${tank.images.normal}" alt="${tank.name}" style="width: 300px;">
-            <p>Нация: ${tank.nation}</p>
+            <p>Нация: ${nation}</p>
             <p>Уровень: ${tank.tier}</p>
-            <p>Тип: ${tank.type}</p>
+            <p>Тип: ${tankType}</p>
             <p>Премиум: ${isPremium}</p>
             <p>Огневая мощь: ${firepower}%</p>
             <p>Прочность: ${hp}</p>
@@ -185,6 +227,68 @@
             <p>Время перезарядки: ${reloadTime} с</p>
         `;
         tankInfoDiv.innerHTML = tankDetails;
+    }
+
+    function searchClan(clanSearch) {
+        if (!clanSearch) {
+            alert("Пожалуйста, введите тег или название клана.");
+            return;
+        }
+
+        const url = `https://papi.tanksblitz.ru/wotb/clans/list/?application_id=${YOUR_API_KEY}&search=${clanSearch}`;
+        fetch(url)
+            .then(response => {
+                if (! response.ok) {
+                    throw new Error("Ошибка сети");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    displayClanList(data.data);
+                } else {
+                    alert("Кланы не найдены.");
+                }
+            })
+            .catch(error => {
+                alert(`Ошибка: ${error.message}`);
+            });
+    }
+
+    function displayClanList(clans) {
+        const clanListDiv = document.getElementById('clanList');
+        clanListDiv.innerHTML = ''; // Очистка предыдущих результатов
+
+        clans.forEach(clan => {
+            const clanItem = document.createElement('div');
+            clanItem.className = 'clan-item';
+            clanItem.textContent = `${clan.tag} - ${clan.name} (ID: ${clan.clan_id})`;
+            clanItem.addEventListener('click', () => displayClanInfo(clan.clan_id));
+            clanListDiv.appendChild(clanItem);
+        });
+    }
+
+    function displayClanInfo(clanId) {
+        const url = `https://papi.tanksblitz.ru/wotb/clans/info/?application_id=${YOUR_API_KEY}&clan_id=${clanId}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const clan = data.data[clanId];
+                const createdAt = new Date(clan.created_at * 1000).toLocaleDateString(); // Преобразование Unix time в обычный формат
+
+                const clanDetails = `
+                    <h2>${clan.name} (${clan.tag})</h2>
+                    <p>ID клана: ${clanId}</p>
+                    <p>Девиз: ${clan.motto}</p>
+                    <p>Описание: ${clan.description}</p>
+                    <p>Никнейм главы: ${clan.leader_name}</p>
+                    <p>Дата создания: ${createdAt}</p>
+                `;
+                document.getElementById('clanInfo').innerHTML = clanDetails;
+            })
+            .catch(error => {
+                alert(`Ошибка: ${error.message}`);
+            });
     }
 
     function getPlayerStats(nickname) {
