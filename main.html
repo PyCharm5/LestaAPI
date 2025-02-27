@@ -60,6 +60,8 @@
         <option value="uk">Великобритания</option>
         <option value="china">Китай</option>
         <option value="japan">Япония</option>
+        <option value="european">Сборная Европы</option>
+        <option value="other">Сборная нация</option>
     </select>
     <select id="tier">
         <option value="">Выберите уровень</option>
@@ -162,6 +164,7 @@
 
         const tankDetails = `
             <h2>${tank.name} (ID: ${tank.tank_id}) </h2>
+            <img src="${tank.images.normal}" alt="${tank.name}" style="width: 300px;">
             <p>Нация: ${tank.nation}</p>
             <p>Уровень: ${tank.tier}</p>
             <p>Тип: ${tank.type}</p>
