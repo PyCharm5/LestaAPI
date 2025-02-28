@@ -27,14 +27,32 @@
             font-size: 20px;
         }
         .tank-list, .clan-list {
-            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Отступ между ячейками */
         }
         .tank-item, .clan-item {
-            cursor: pointer;
-            margin: 5px 0;
+            width: calc(25% - 10px); /* 4 ячейки в ряд, учитывая отступ */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            text-align: center;
+            box-sizing: border-box; /* Учитывать отступы и границы в ширине */
+            cursor: pointer;
+        }
+        .tank-item img {
+            width: 100%; /* Изображение занимает всю ширину ячейки */
+            height: auto; /* Автоматическая высота */
+        }
+        .clan-item {
+            width: calc(25% - 10px); /* 4 ячейки в ряд, учитывая отступ */
+            padding: 5px; /* Уменьшение отступов */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            box-sizing: border-box; /* Учитывать отступы и границы в ширине */
+            cursor: pointer;
+            font-size: 14px; /* Уменьшение размера шрифта */
         }
         .tank-info, .clan-info {
             margin-top: 20px;
@@ -165,7 +183,15 @@
         tanks.forEach(tank => {
             const tankItem = document.createElement('div');
             tankItem.className = 'tank-item';
-            tankItem.textContent = `${tank.name} (ID: ${tank.tank_id})`;
+
+            // Создание содержимого ячейки
+            tankItem.innerHTML = `
+                <img src="${tank.images.normal}" alt="${tank.name}">
+                <p>${tank.name}</p>
+                <p>Уровень: ${tank.tier}</p> <!-- Добавление уровня танка -->
+                <p>ID: ${tank.tank_id}</p>
+            `;
+
             tankItem.addEventListener('click', () => displayTankInfo(tank));
             tankListDiv.appendChild(tankItem);
         });
@@ -238,7 +264,7 @@
         const url = `https://papi.tanksblitz.ru/wotb/clans/list/?application_id=${YOUR_API_KEY}&search=${clanSearch}`;
         fetch(url)
             .then(response => {
-                if (! response.ok) {
+                if (!response.ok) {
                     throw new Error("Ошибка сети");
                 }
                 return response.json();
@@ -259,10 +285,22 @@
         const clanListDiv = document.getElementById('clanList');
         clanListDiv.innerHTML = ''; // Очистка предыдущих результатов
 
+        if (clans.length === 0) {
+            clanListDiv.textContent = 'Кланы не найдены.';
+            return;
+        }
+
         clans.forEach(clan => {
             const clanItem = document.createElement('div');
             clanItem.className = 'clan-item';
-            clanItem.textContent = `${clan.tag} - ${clan.name} (ID: ${clan.clan_id})`;
+
+            // Создание содержимого ячейки
+            clanItem.innerHTML = `
+                <p><strong>${clan.tag}</strong></p>
+                <p>${clan.name}</p>
+                <p>ID: ${clan.clan_id}</p>
+            `;
+
             clanItem.addEventListener('click', () => displayClanInfo(clan.clan_id));
             clanListDiv.appendChild(clanItem);
         });
