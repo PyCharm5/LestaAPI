@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
     <title>BlitzStats - Статистика игроков</title>
     <style>
-        body {
+        main {
             font-family: "Rubik Mono One", sans-serif;
             margin: 20px;
         }
@@ -66,62 +66,87 @@
             vertical-align: middle; /* Выравнивание по центру */
             margin-left: 5px; /* Отступ слева от текста */
         }
+        nav {
+            margin-bottom: 20px;
+        }
+        nav button {
+            margin-right: 10px;
+        }
+        .module {
+            display: none; /* Скрыть все модули по умолчанию */
+        }
+        .active {
+            display: block; /* Показать активный модуль */
+        }
     </style>
 </head>
 <body>
 
-<h1>Поиск игрока</h1>
+<nav>
+    <button id="playerSearchNav">Поиск игрока</button>
+    <button id="tankSearchNav">Поиск танка</button>
+    <button id="clanSearchNav">Поиск клана</button>
+</nav>
+
+<hr>
 
 <main>
-    <input type="text" id="nickname" placeholder="Введите никнейм или ID">
-    <button id="searchButton">Поиск</button>
-    <div class="result" id="resultLabel"></div>
-    <hr>
+    <div id="playerSearch" class="module active">
+        <h1>Поиск игрока</h1>
+        <input type="text" id="nickname" placeholder="Введите никнейм или ID">
+        <button id="searchButton">Поиск</button>
+        <div class="result" id="resultLabel"></div>
+    </div>
 
-    <h1>Поиск танка</h1>
-    <select id="nation">
-        <option value="">Выберите нацию</option>
-        <option value="ussr">СССР</option>
-        <option value="germany">Германия</option>
-        <option value="usa">США</option>
-        <option value="france">Франция</option>
-        <option value="uk">Великобритания</option>
-        <option value="china">Китай</option>
-        <option value="japan">Япония</option>
-        <option value="european">Сборная Европы</option>
-        <option value="other">Сборная нация</option>
-    </select>
-    <select id="tier">
-        <option value="">Выберите уровень</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-    </select>
-    <select id="type">
-        <option value="">Выберите тип техники</option>
-        <option value="lightTank">Легкий</option>
-        <option value="mediumTank">Средний</option>
-        <option value="heavyTank">Тяжелый</option>
-        <option value="AT-SPG">ПТ-САУ</option>
-    </select>
-    <button id="searchTankButton">Поиск танка</button>
-    <div class="tank-list" id="tankList"></div>
-    <div class="tank-info" id="tankInfo"></div>
-    <hr>
+    <div id="tankSearch" class="module">
+        <h1>Поиск танка</h1>
+        <select id="nation">
+            <option value="">Выберите нацию</option>
+            <option value="ussr">СССР</option>
+            <option value="germany">Германия</option>
+            <option value="usa">США</option>
+            <option value="france">Франция</option>
+            <option value="uk">Великобритания</option>
+            <option value="china">Китай</option>
+            <option value="japan">Япония</option>
+            <option value="european">Сборная Европы</option>
+            <option value="other">Сборная нация</option>
+        </select>
+        <select id="tier">
+            <option value="">Выберите уровень</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+        </select>
+        <select id="type">
+            <option value="">Выберите тип техники</option>
+            <option value="lightTank">Легкий</option>
+            <option value="mediumTank">Средний</option>
+            <option value="heavyTank">Тяжелый</option>
+            <option value="AT-SPG">ПТ-САУ</option>
+        </select>
+        <button id="searchTankButton">Поиск танка</button>
+        <div class="tank-list" id="tankList"></div>
+        <div class="tank-info" id="tankInfo"></div>
+    </div>
 
-    <h1>Поиск клана</h1>
-    <input type="text" id="clanSearch" placeholder="Введите тег или название клана">
-    <button id="searchClanButton">Поиск клана</button>
-    <div class="clan-list" id="clanList"></div>
-    <div class="clan-info" id="clanInfo"></div>
+    <div id="clanSearch" class="module">
+        <h1>Поиск клана</h1>
+        <input type="text" id="clanSearchInput" placeholder="Введите тег или название клана">
+        <button id="searchClanButton">Поиск клана</button>
+        <div class="clan-list" id="clanList"></div>
+        <div class="clan-info" id="clanInfo"></div>
+    </div>
 </main>
+
+<hr>
 
 <footer>
     © Леста Игры, 2022–2025. Игры «Мир танков», «Мир кораблей», Tanks Blitz основаны на интеллектуальной собственности третьих лиц. Все права на объекты прав третьих лиц принадлежат их законным правообладателям.
@@ -143,9 +168,29 @@
     });
 
     document.getElementById('searchClanButton').addEventListener('click', function() {
-        const clanSearch = document.getElementById('clanSearch').value;
+        const clanSearch = document.getElementById('clanSearchInput').value;
         searchClan(clanSearch);
     });
+
+    document.getElementById('playerSearchNav').addEventListener('click', function() {
+        showModule('playerSearch');
+    });
+
+    document.getElementById('tankSearchNav').addEventListener('click', function() {
+        showModule('tankSearch');
+    });
+
+    document.getElementById('clanSearchNav').addEventListener('click', function() {
+        showModule('clanSearch');
+    });
+
+    function showModule(moduleId) {
+        const modules = document.querySelectorAll('.module');
+        modules.forEach(module => {
+            module.classList.remove('active');
+        });
+        document.getElementById(moduleId).classList.add('active');
+    }
 
     function searchTank(nation, tier, type) {
         let url = `https://papi.tanksblitz.ru/wotb/encyclopedia/vehicles/?application_id=${YOUR_API_KEY}`;
@@ -166,7 +211,7 @@
                     });
                     displayTankList(filteredTanks);
                 } else {
-                    alert("Танки не найдены.");
+                    alert(" Танки не найдены.");
                 }
             })
             .catch(error => {
@@ -275,7 +320,7 @@
             .then(data => {
                 if (data.data && data.data.length > 0) {
                     displayClanList(data.data);
-                } else {
+ } else {
                     alert("Кланы не найдены.");
                 }
             })
