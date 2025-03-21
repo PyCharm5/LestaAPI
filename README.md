@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
     <title>BlitzStats - Статистика игроков</title>
     <style>
         main {
-            font-family: "Arial", sans-serif;
+            font-family: "Rubik Mono One", sans-serif;
             margin: 20px;
         }
         h1 {
@@ -32,20 +35,21 @@
             gap: 10px; /* Отступ между ячейками */
         }
         .tank-item, .clan-item {
-            width: calc(25% - 10px); /* 4 ячейки в ряд, учитывая отступ */
+            width: 200px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             text-align: center;
             box-sizing: border-box; /* Учитывать отступы и границы в ширине */
             cursor: pointer;
+            overflow: hidden;
         }
         .tank-item img {
             width: 100%; /* Изображение занимает всю ширину ячейки */
             height: auto; /* Автоматическая высота */
         }
         .clan-item {
-            width: calc(25% - 10px); /* 4 ячейки в ряд, учитывая отступ */
+            width: 150px;
             padding: 5px; /* Уменьшение отступов */
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -53,6 +57,7 @@
             box-sizing: border-box; /* Учитывать отступы и границы в ширине */
             cursor: pointer;
             font-size: 14px; /* Уменьшение размера шрифта */
+            overflow: hidden;
         }
         .tank-info, .clan-info {
             margin-top: 20px;
@@ -146,7 +151,8 @@
 <hr>
 
 <footer>
-    © Леста Игры, 2022–2025. Игры «Мир танков», «Мир кораблей», Tanks Blitz основаны на интеллектуальной собственности третьих лиц. Все права на объекты прав третьих лиц принадлежат их законным правообладателям.
+    © Леста Игры, 2022–2025. Игры «Мир танков», «Мир кораблей», Tanks Blitz основаны на интеллектуальной собственности
+    третьих лиц. Все права на объекты прав третьих лиц принадлежат их законным правообладателям.
 </footer>
 
 <script>
@@ -296,6 +302,7 @@
             </ul>
             <p>Разброс на 100 м: ${dispersion}</p>
             <p>Время перезарядки: ${reloadTime} с</p>
+            <p>Описание: ${tank.description}</p>
         `;
         tankInfoDiv.innerHTML = tankDetails;
     }
