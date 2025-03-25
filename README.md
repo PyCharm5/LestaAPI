@@ -100,7 +100,7 @@
     <div id="playerSearch" class="module active">
         <h1>Поиск игрока</h1>
         <input type="text" id="nickname" placeholder="Введите никнейм или ID">
-        <button id="searchButton" class="btn btn-succes">Поиск</button>
+        <button id="searchButton" class="btn btn-success">Поиск</button>
         <div class="result" id="resultLabel"></div>
     </div>
 
@@ -138,7 +138,7 @@
             <option value="heavyTank">Тяжелый</option>
             <option value="AT-SPG">ПТ-САУ</option>
         </select>
-        <button id="searchTankButton" class="btn btn-succes">Поиск танка</button>
+        <button id="searchTankButton" class="btn btn-success">Поиск танка</button>
         <div class="tank-list" id="tankList"></div>
         <div class="tank-info" id="tankInfo"></div>
     </div>
@@ -146,7 +146,7 @@
     <div id="clanSearch" class="module">
         <h1>Поиск клана</h1>
         <input type="text" id="clanSearchInput" placeholder="Введите тег или название клана">
-        <button id="searchClanButton" class="btn btn-succes">Поиск клана</button>
+        <button id="searchClanButton" class="btn btn-success">Поиск клана</button>
         <div class="clan-list" id="clanList"></div>
         <div class="clan-info" id="clanInfo"></div>
     </div>
