@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
@@ -17,7 +18,7 @@
             font-weight: bold;
         }
         input, select {
-            width: 300px;
+            width: 500px;
             padding: 10px;
             margin-bottom: 10px;
         }
@@ -68,11 +69,8 @@
             vertical-align: middle; /* Выравнивание по центру */
             margin-left: 5px; /* Отступ слева от текста */
         }
-        nav {
-            margin-bottom: 20px;
-        }
         nav button {
-            margin-right: 10px;
+            margin: 10px
         }
         .module {
             display: none; /* Скрыть все модули по умолчанию */
@@ -84,10 +82,16 @@
 </head>
 <body>
 
+<header>
+    <a href="/login" class="button">Вход</a>
+    <a href="/register" class="button">Регистрация</a>
+    <a href="/profile" class="button">Профиль</a>
+</header>
+
 <nav>
-    <button id="playerSearchNav">Поиск игрока</button>
-    <button id="tankSearchNav">Поиск танка</button>
-    <button id="clanSearchNav">Поиск клана</button>
+    <button id="playerSearchNav" class="btn btn-primary">Поиск игрока</button>
+    <button id="tankSearchNav"  class="btn btn-primary">Поиск танка</button>
+    <button id="clanSearchNav"  class="btn btn-primary">Поиск клана</button>
 </nav>
 
 <hr>
@@ -96,25 +100,25 @@
     <div id="playerSearch" class="module active">
         <h1>Поиск игрока</h1>
         <input type="text" id="nickname" placeholder="Введите никнейм или ID">
-        <button id="searchButton">Поиск</button>
+        <button id="searchButton" class="btn btn-succes">Поиск</button>
         <div class="result" id="resultLabel"></div>
     </div>
 
     <div id="tankSearch" class="module">
         <h1>Поиск танка</h1>
-        <select id="nation">
-            <option value="">Выберите нацию</option>
-            <option value="ussr">СССР</option>
-            <option value="germany">Германия</option>
-            <option value="usa">США</option>
-            <option value="france">Франция</option>
-            <option value="uk">Великобритания</option>
-            <option value="china">Китай</option>
-            <option value="japan">Япония</option>
+        <select id="nation" class="form-control">
+            <option value=""        >Выберите нацию</option>
+            <option value="ussr"    >СССР</option>
+            <option value="germany" >Германия</option>
+            <option value="usa"     >США</option>
+            <option value="france"  >Франция</option>
+            <option value="uk"      >Великобритания</option>
+            <option value="china"   >Китай</option>
+            <option value="japan"   >Япония</option>
             <option value="european">Сборная Европы</option>
-            <option value="other">Сборная нация</option>
+            <option value="other"   >Сборная нация</option>
         </select>
-        <select id="tier">
+        <select id="tier" class="form-control">
             <option value="">Выберите уровень</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -127,14 +131,14 @@
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
-        <select id="type">
+        <select id="type" class="form-control">
             <option value="">Выберите тип техники</option>
             <option value="lightTank">Легкий</option>
             <option value="mediumTank">Средний</option>
             <option value="heavyTank">Тяжелый</option>
             <option value="AT-SPG">ПТ-САУ</option>
         </select>
-        <button id="searchTankButton">Поиск танка</button>
+        <button id="searchTankButton" class="btn btn-succes">Поиск танка</button>
         <div class="tank-list" id="tankList"></div>
         <div class="tank-info" id="tankInfo"></div>
     </div>
@@ -142,7 +146,7 @@
     <div id="clanSearch" class="module">
         <h1>Поиск клана</h1>
         <input type="text" id="clanSearchInput" placeholder="Введите тег или название клана">
-        <button id="searchClanButton">Поиск клана</button>
+        <button id="searchClanButton" class="btn btn-succes">Поиск клана</button>
         <div class="clan-list" id="clanList"></div>
         <div class="clan-info" id="clanInfo"></div>
     </div>
