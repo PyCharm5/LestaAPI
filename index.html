@@ -82,10 +82,11 @@
 </head>
 <body>
 
-<header>
-    <a href="/login" class="button">Вход</a>
-    <a href="/register" class="button">Регистрация</a>
-    <a href="/profile" class="button">Профиль</a>
+<header class="header">
+    <a href="" class="btn btn-">Главная</a>
+    <a href="" class="btn btn-">Вход</a>
+    <a href="" class="btn btn-">Профиль</a>
+    <a href="" class="btn btn-">Выход</a>
 </header>
 
 <nav>
