@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
-    <title>BlitzStats - Статистика игроков</title>
+    <title>LestaAPI - Статистика игроков</title>
     <style>
         main {
             font-family: "Rubik Mono One", sans-serif;
