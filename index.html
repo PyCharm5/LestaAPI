@@ -3,96 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
     <title>LestaAPI - Статистика игроков</title>
-    <style>
-        main {
-            font-family: "Rubik Mono One", sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            font-size: 30px;
-            font-weight: bold;
-        }
-        input, select {
-            width: 500px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-        }
-        .tank-list, .clan-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px; /* Отступ между ячейками */
-        }
-        .tank-item, .clan-item {
-            width: 200px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            text-align: center;
-            box-sizing: border-box; /* Учитывать отступы и границы в ширине */
-            cursor: pointer;
-            overflow: hidden;
-        }
-        .tank-item img {
-            width: 100%; /* Изображение занимает всю ширину ячейки */
-            height: auto; /* Автоматическая высота */
-        }
-        .clan-item {
-            width: 150px;
-            padding: 5px; /* Уменьшение отступов */
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            text-align: center;
-            box-sizing: border-box; /* Учитывать отступы и границы в ширине */
-            cursor: pointer;
-            font-size: 14px; /* Уменьшение размера шрифта */
-            overflow: hidden;
-        }
-        .tank-info, .clan-info {
-            margin-top: 20px;
-        }
-        .flag {
-            width: 20px; /* Размер флага */
-            height: auto; /* Автоматическая высота */
-            vertical-align: middle; /* Выравнивание по центру */
-            margin-left: 5px; /* Отступ слева от текста */
-        }
-        nav button {
-            margin: 10px
-        }
-        .module {
-            display: none; /* Скрыть все модули по умолчанию */
-        }
-        .active {
-            display: block; /* Показать активный модуль */
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="enter.js"></script>
 </head>
 <body>
 
 <header class="header">
-    <a href="" class="btn btn-">Главная</a>
-    <a href="" class="btn btn-">Вход</a>
-    <a href="" class="btn btn-">Профиль</a>
-    <a href="" class="btn btn-">Выход</a>
+    <a href="index.html" class="btn btn-">Главная</a>
+    <a href="" class="btn btn-" id="loginButton">Вход</a>
+    <a href="profile.html" class="btn btn-">Профиль</a>
+    <a href="exit.html" class="btn btn-">Выход</a>
 </header>
 
 <nav>
     <button id="playerSearchNav" class="btn btn-primary">Поиск игрока</button>
-    <button id="tankSearchNav"  class="btn btn-primary">Поиск танка</button>
-    <button id="clanSearchNav"  class="btn btn-primary">Поиск клана</button>
+    <button id="tankSearchNav" class="btn btn-primary">Поиск танка</button>
+    <button id="clanSearchNav" class="btn btn-primary">Поиск клана</button>
 </nav>
 
 <hr>
@@ -108,16 +40,16 @@
     <div id="tankSearch" class="module">
         <h1>Поиск танка</h1>
         <select id="nation" class="form-control">
-            <option value=""        >Выберите нацию</option>
-            <option value="ussr"    >СССР</option>
-            <option value="germany" >Германия</option>
-            <option value="usa"     >США</option>
-            <option value="france"  >Франция</option>
-            <option value="uk"      >Великобритания</option>
-            <option value="china"   >Китай</option>
-            <option value="japan"   >Япония</option>
+            <option value="">Выберите нацию</option>
+            <option value="ussr">СССР</option>
+            <option value="germany">Германия</option>
+            <option value="usa">США</option>
+            <option value="france">Франция</option>
+            <option value="uk">Великобритания</option>
+            <option value="china">Китай</option>
+            <option value="japan">Япония</option>
             <option value="european">Сборная Европы</option>
-            <option value="other"   >Сборная нация</option>
+            <option value="other">Сборная нация</option>
         </select>
         <select id="tier" class="form-control">
             <option value="">Выберите уровень</option>
