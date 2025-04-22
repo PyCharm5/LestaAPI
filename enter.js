@@ -2,7 +2,7 @@
 
 // Функция для выполнения запроса
 async function fetchAccessToken() {
-    const url = 'https://api.tanki.su/wot/auth/login/?application_id=1377836fd8c2ecb2382bb3dd08d1f071&expires_at=1746154041&redirect_uri=index.html';
+    const url = 'https://api.tanki.su/wot/auth/login/?application_id=1377836fd8c2ecb2382bb3dd08d1f071&expires_at=1746154041&redirect_uri=https://pycharm5.github.io/LestaAPI/';
 
     try {
         // Отправляем запрос
