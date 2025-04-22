@@ -1,0 +1,4 @@
+https://papi.tanksblitz.ru/wotb/account/list/?application_id=${config.applicationId}
+https://papi.tanksblitz.ru/wotb/account/info/?application_id=${config.applicationId}&account_id={accountId}
+https://papi.tanksblitz.ru/wotb/account/achievements/?application_id=${config.applicationId}
+https://papi.tanksblitz.ru/wotb/account/tankstats/?application_id=${config.applicationId}
