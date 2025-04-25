@@ -49,6 +49,42 @@
             margin-right: 5px;
             margin-bottom: 5px;
         }
+        .achievement-item {
+            width: 300px;
+            margin: 10px;
+            display: inline-block;
+            vertical-align: top;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .achievement-image {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+        .achievement-name {
+            font-weight: bold;
+            padding: 8px;
+            background-color: #f8f9fa;
+        }
+        .achievement-desc {
+            padding: 8px;
+            font-size: 0.9em;
+        }
+        .achievement-count {
+            padding: 8px;
+            text-align: right;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .achievements-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -71,13 +107,10 @@
 
     <div class="profile-header d-flex flex-column flex-md-row align-items-center" id="profile-header"
          style="display: none;">
-        <div class="text-center mb-3 mb-md-0 me-md-4">
-            <img id="player-avatar" src="https://via.placeholder.com/150" alt="Аватар" class="avatar">
-        </div>
         <div class="flex-grow-1">
             <div class="d-flex flex-wrap align-items-center mb-2">
                 <h1 id="player-nickname" class="h3 mb-0 me-2"></h1>
-                <span id="player-level" class="badge bg-primary badge-custom">Уровень: загрузка...</span>
+                <span id="player-level" class="badge bg-primary badge-custom"></span>
             </div>
 
             <div class="row">
@@ -174,14 +207,14 @@
             </div>
         </div>
 
-        <div class="tab-pane fade" id="achievements" role="tabpanel">
+         <div class="tab-pane fade" id="achievements" role="tabpanel">
             <div id="loading-achievements" class="loading-spinner">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Загрузка...</span>
                 </div>
                 <p class="mt-2">Загрузка достижений...</p>
             </div>
-            <div id="achievements-content" class="row" style="display: none;">
+            <div id="achievements-content" class="achievements-grid" style="display: none;">
                 <!-- Достижения будут загружены здесь -->
             </div>
         </div>
@@ -346,39 +379,85 @@
     elements.capturePoints.textContent = stats.capture_points || 0;
     }
 
-    function updateAchievements(achievements) {
-    const achievementMap = {
-        'warrior': { name: 'Воин', desc: 'Нанести урон и выжить в бою' },
-        'supporter': { name: 'Поддержка', desc: 'Помощь союзникам в бою' },
-        'medalKolobanov': { name: 'Колобанов', desc: 'Победить 1 против 5' },
-        'medalRadleyWalters': { name: 'Рэдли-Уолтерс', desc: 'Уничтожить 8+ танков' },
-        'medalLafayettePool': { name: 'Лафайет Пул', desc: 'Уничтожить 10+ танков' },
-        'medalOrlik': { name: 'Орлик', desc: 'Уничтожить 3 танка выше уровнем' },
-        'medalHalonen': { name: 'Халоунен', desc: 'Уничтожить 3 танка за 30 сек' },
-        'markOfMastery': { name: 'Знак мастерства', desc: 'Высшее мастерство' },
-        'markOfMastery1': { name: 'Знак мастерства I', desc: 'Уровень мастерства I' },
-        'markOfMastery2': { name: 'Знак мастерства II', desc: 'Уровень мастерства II' },
-        'markOfMastery3': { name: 'Знак мастерства III', desc: 'Уровень мастерства III' },
-        'markOfMastery4': { name: 'Знак мастерства IV', desc: 'Уровень мастерства IV' }
-    };
+    async function updateAchievements(achievements) {
+    try {
+        // Сначала загружаем информацию о всех достижениях
+        const achievementsInfo = await fetchAchievementsInfo();
 
-    let html = '';
+        let html = '';
 
-    Object.entries(achievementMap).forEach(([key, info]) => {
-        if (achievements[key] > 0) {
-            html += `
-                <div class="col-md-4 mb-3">
-                    <div class="stat-card bg-light p-3">
-                        <h6 class="h6 mb-1">${info.name}</h6>
-                        <p class="small text-muted mb-2">${info.desc}</p>
-                        <span class="badge bg-success">${achievements[key]}</span>
+        // Сортируем достижения по количеству (от большего к меньшему)
+        const sortedAchievements = Object.entries(achievements)
+            .filter(([key, value]) => value > 0)
+            .sort((a, b) => b[1] - a[1]);
+
+        if (sortedAchievements.length === 0) {
+            html = '<div class="col-12 text-muted">Достижения не найдены</div>';
+        } else {
+            for (const [achievementId, count] of sortedAchievements) {
+                const achievementInfo = achievementsInfo.data[achievementId];
+
+                if (!achievementInfo) continue;
+
+                // Обработка достижений с несколькими степенями (options)
+                let imageUrl, name, description;
+
+                if (achievementInfo.options) {
+                    // Для достижений с несколькими степенями берем последнюю (наивысшую)
+                    const lastOption = achievementInfo.options[achievementInfo.options.length - 1];
+                    imageUrl = lastOption.image_big || lastOption.image;
+                    name = lastOption.name;
+                    description = lastOption.description;
+                } else {
+                    imageUrl = achievementInfo.image_big || achievementInfo.image;
+                    name = achievementInfo.name;
+                    description = achievementInfo.description;
+                }
+
+                // Проверяем URL изображения
+                if (imageUrl) {
+                    // Исправляем URL если нужно
+                    if (imageUrl.startsWith('http://')) {
+                        imageUrl = imageUrl.replace('http://', 'https://');
+                    }
+                    if (!imageUrl.startsWith('http')) {
+                        imageUrl = 'https://glossary-static-cdn.lesta.ru' + imageUrl;
+                    }
+                }
+
+                // Очищаем описание от лишних символов
+                description = description.replace(/•/g, '').trim();
+
+                html += `
+                    <div class="achievement-item">
+                        <div class="achievement-image-container">
+                            <img src="${imageUrl}" alt="${name}" class="this.onerror=null;this.src='https://via.placeholder.com/300x100?text=Image+Error'achievement-image"
+                                 onerror="">
+                        </div>
+                        <div class="achievement-name">${name.split('(')[0].trim()}</div>
+                        <div class="achievement-desc">${description}</div>
+                        <div class="achievement-count">${count} раз</div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
-    });
 
-    elements.achievementsContent.innerHTML = html || '<div class="col-12 text-muted">Достижения не найдены</div>';
+            elements.achievementsContent.innerHTML = html;
+        } catch (error) {
+            console.error('Ошибка загрузки информации о достижениях:', error);
+            elements.achievementsContent.innerHTML = '<div class="col-12 text-danger">Ошибка загрузки достижений: ' + error.message + '</div>';
+        }
+    }
+
+    /**
+    * Получение информации о всех достижениях игры
+    * Запрос: GET https://papi.tanksblitz.ru/wotb/encyclopedia/achievements/
+    */
+    async function fetchAchievementsInfo() {
+        const response = await fetch(
+            `https://papi.tanksblitz.ru/wotb/encyclopedia/achievements/?application_id=${config.applicationId}`
+        );
+        return await response.json();
     }
 
     // Основная функция загрузки данных
