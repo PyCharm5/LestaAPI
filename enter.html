@@ -10,6 +10,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
     <title>LestaAPI - Вход</title>
     <link rel="stylesheet" href="style.css">
+
+    <script>
+        function startAuth() {
+            const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
+            const redirectUri = encodeURIComponent("https://pycharm5.github.io/LestaAPI/auth.html");
+            const authUrl = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
+
+            // Открываем в новом окне для лучшего UX
+            const authWindow = window.open(authUrl, "LestaAuth", "width=800,height=600");
+
+            // Проверяем авторизацию каждые 500мс
+            const checkAuth = setInterval(() => {
+                try {
+                    if (authWindow.closed) {
+                        clearInterval(checkAuth);
+                        checkLocalStorageAuth();
+                    }
+                } catch(e) {
+                    console.log("Ожидание авторизации...");
+                }
+            }, 500);
+        }
+
+        function checkLocalStorageAuth() {
+            const token = localStorage.getItem('lesta_access_token');
+            if (token) {
+                window.location.href = "index.html";
+            } else {
+                document.getElementById("authStatus").textContent = "Авторизация не удалась";
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -24,9 +56,9 @@
 
 <main>
     <div class="container text-center mt-5">
-        <h2>Вход через Lesta Games</h2>
+        <h2>Вход через Lesta Games</h2>=
+        <button id="loginBtn" class="btn btn-primary" onclick="startAuth()">Войти через Lesta ID</button>
         <div id="authStatus"></div>
-        <button id="loginBtn" class="btn btn-primary">Войти через Lesta ID</button>
     </div>
 </main>
 
@@ -38,11 +70,33 @@
 </footer>
 
 <script>
-    document.getElementById('loginBtn').addEventListener('click', function() {
-            const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
-            const redirectUri = `https://pycharm5.github.io/LestaAPI/auth.html`;
-            window.location.href = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
-        });
+    function startAuth() {
+        const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
+        const redirectUri = encodeURIComponent("https://pycharm5.github.io/LestaAPI/auth.html");
+        const authUrl = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
+
+        const authWindow = window.open(authUrl, "LestaAuth", "width=800,height=600");
+
+        const checkAuth = setInterval(() => {
+            try {
+                if (authWindow.closed) {
+                    clearInterval(checkAuth);
+                    checkLocalStorageAuth();
+                }
+            } catch(e) {
+                console.log("Ожидание авторизации...");
+            }
+        }, 500);
+    }
+
+    function checkLocalStorageAuth() {
+        const token = localStorage.getItem('lesta_access_token');
+        if (token) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById("authStatus").textContent = "Авторизация не удалась";
+        }
+    }
 </script>
 </body>
 </html>
