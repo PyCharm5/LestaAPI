@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Обработка авторизации</title>
+    <script>
+        function parseHashParams() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+
+            if (params.has('access_token') && params.has('nickname')) {
+                localStorage.setItem('lesta_access_token', params.get('access_token'));
+                localStorage.setItem('lesta_nickname', params.get('nickname'));
+                localStorage.setItem('lesta_account_id', params.get('account_id'));
+
+                // Перенаправляем на главную с флагом успешной авторизации
+                window.location.href = 'index.html?auth=success';
+            } else {
+                window.location.href = 'index.html?auth=failed';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', parseHashParams);
+    </script>
+</head>
+<body>
+    <p>Пожалуйста, подождите, идёт обработка авторизации...</p>
+</body>
+</html>
