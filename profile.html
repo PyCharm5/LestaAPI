@@ -261,22 +261,34 @@
     loadingAchievements: document.getElementById('loading-achievements')
     };
 
+    // Проверка авторизации
+    if (!localStorage.getItem('lesta_access_token')) {
+        alert('Для доступа к профилю необходимо авторизоваться');
+        window.location.href = 'enter.html';
+    } else {
+        // Автозагрузка статистики
+        const nickname = localStorage.getItem('lesta_nickname');
+        document.getElementById('player-search').value = nickname;
+        document.getElementById('search-button').click();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const accessToken = localStorage.getItem('lesta_access_token');
         const nickname = localStorage.getItem('lesta_nickname');
+        const accountId = localStorage.getItem('lesta_account_id');
 
-        if (!accessToken || !nickname) {
-            alert('Пожалуйста, войдите в систему');
-            window.location.href = 'enter.html';
-        } else {
-            // Показываем данные пользователя
-            alert(`Текущий пользователь:\nНикнейм: ${nickname}\nAccess Token: ${accessToken}`);
+    if (!accessToken || !nickname) {
+        alert('Пожалуйста, войдите в систему');
+        window.location.href = 'enter.html';
+    } else {
+        // Автоматически загружаем статистику пользователя
+        document.getElementById('player-search').value = nickname;
+        document.getElementById('search-button').click();
 
-            // Можно также автоматически загрузить статистику этого пользователя
-            document.getElementById('player-search').value = nickname;
-            document.getElementById('search-button').click();
-        }
-    });
+        // Показываем данные пользователя
+        alert(`Текущий пользователь:\nНикнейм: ${nickname}\nAccount ID: ${accountId}\nAccess Token: ${accessToken}`);
+    }
+});
 
     // Инициализация
     document.addEventListener('DOMContentLoaded', () => {
