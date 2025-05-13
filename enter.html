@@ -25,7 +25,7 @@
 <main>
     <div class="container text-center mt-5">
         <h2>Вход через Lesta Games</h2>
-        <p>Вы будете перенаправлены на официальный сайт для авторизации</p>
+        <div id="authStatus"></div>
         <button id="loginBtn" class="btn btn-primary">Войти через Lesta ID</button>
     </div>
 </main>
@@ -39,39 +39,10 @@
 
 <script>
     document.getElementById('loginBtn').addEventListener('click', function() {
-        const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
-        const redirectUri = `https://pycharm5.github.io/LestaAPI/`;
-        const authUrl = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
-        window.location.href = authUrl;
-    });
-
-    // Проверяем параметры URL после возвращения с авторизации
-    function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        const fragmentParams = new URLSearchParams(window.location.hash.substring(1));
-
-        const accessToken = params.get('access_token') || fragmentParams.get('access_token');
-        const nickname = params.get('nickname') || fragmentParams.get('nickname');
-
-        return { accessToken, nickname };
-    }
-
-    // При загрузке страницы проверяем параметры авторизации
-    window.addEventListener('DOMContentLoaded', () => {
-        const { accessToken, nickname } = getUrlParams();
-
-        if (accessToken && nickname) {
-            // Сохраняем данные в localStorage
-            localStorage.setItem('lesta_access_token', accessToken);
-            localStorage.setItem('lesta_nickname', nickname);
-
-            // Показываем данные пользователя
-            alert(`Успешный вход!\nНикнейм: ${nickname}\nAccess Token: ${accessToken}`);
-
-            // Перенаправляем на главную страницу
-            window.location.href = 'index.html';
-        }
-    });
+            const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
+            const redirectUri = `https://pycharm5.github.io/LestaAPI/auth.html`;
+            window.location.href = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
+        });
 </script>
 </body>
 </html>
