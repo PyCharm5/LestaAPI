@@ -95,15 +95,51 @@
 <script>
     const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071"; // Замените на ваш API ключ
 
+    // Проверка авторизации при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
         const accessToken = localStorage.getItem('lesta_access_token');
         const nickname = localStorage.getItem('lesta_nickname');
 
         if (accessToken && nickname) {
-            document.getElementById('loginButton').textContent = nickname;
-            document.getElementById('loginButton').href = 'profile.html';
+            // Меняем кнопку "Вход" на никнейм
+            const loginButton = document.getElementById('loginButton');
+            loginButton.textContent = nickname;
+            loginButton.href = 'profile.html';
+
+            // Показываем данные в alert (можно убрать после тестирования)
+            alert(`Добро пожаловать, ${nickname}!\nAccess Token: ${accessToken}`);
         }
     });
+
+    // Проверка авторизации при загрузке
+    function checkAuth() {
+        const authToken = localStorage.getItem('lesta_access_token');
+        const nickname = localStorage.getItem('lesta_nickname');
+
+        if (authToken && nickname) {
+            document.getElementById('loginButton').textContent = nickname;
+            document.getElementById('loginButton').href = 'profile.html';
+
+            // Показываем уведомление об успешном входе
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('auth') === 'success') {
+                alert(`Успешный вход! Добро пожаловать, ${nickname}`);
+                // Убираем параметр из URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    }
+
+    // Обработчик кнопки входа
+    document.getElementById('loginButton').addEventListener('click', function(e) {
+        if (!localStorage.getItem('lesta_access_token')) {
+            e.preventDefault();
+            window.location.href = 'enter.html';
+        }
+    });
+
+    // Проверяем авторизацию при загрузке
+    document.addEventListener('DOMContentLoaded', checkAuth);
 
     document.getElementById('searchButton').addEventListener('click', function() {
         const nickname = document.getElementById('nickname').value;
