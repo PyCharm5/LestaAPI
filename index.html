@@ -16,7 +16,7 @@
 
 <header class="header">
     <a href="index.html" class="btn btn-">Главная</a>
-    <a href="#" class="btn btn-" id="loginButton">Вход</a>
+    <a href="enter.html" class="btn btn-">Вход</a>
     <a href="profile.html" class="btn btn-">Профиль</a>
     <a href="exit.html" class="btn btn-">Выход</a>
 </header>
@@ -95,6 +95,16 @@
 <script>
     const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071"; // Замените на ваш API ключ
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const accessToken = localStorage.getItem('lesta_access_token');
+        const nickname = localStorage.getItem('lesta_nickname');
+
+        if (accessToken && nickname) {
+            document.getElementById('loginButton').textContent = nickname;
+            document.getElementById('loginButton').href = 'profile.html';
+        }
+    });
+
     document.getElementById('searchButton').addEventListener('click', function() {
         const nickname = document.getElementById('nickname').value;
         getPlayerStats(nickname);
@@ -122,6 +132,14 @@
 
     document.getElementById('clanSearchNav').addEventListener('click', function() {
         showModule('clanSearch');
+    });
+
+    document.getElementById('loginButton').addEventListener('click', function(e) {
+        const accessToken = localStorage.getItem('lesta_access_token');
+        if (!accessToken) {
+            e.preventDefault();
+            window.location.href = 'enter.html';
+        }
     });
 
     function showModule(moduleId) {
