@@ -16,7 +16,7 @@
 
 <header class="header">
     <a href="index.html" class="btn btn-">Главная</a>
-    <a href="enter.html" class="btn btn-">Вход</a>
+    <a href="enter.html" class="btn btn-" id="loginButton">Вход</a>
     <a href="profile.html" class="btn btn-">Профиль</a>
     <a href="exit.html" class="btn btn-">Выход</a>
 </header>
@@ -111,14 +111,16 @@
         }
     });
 
-    // Проверка авторизации при загрузке
+    // Проверка авторизации при загрузке страницы
     function checkAuth() {
-        const authToken = localStorage.getItem('lesta_access_token');
+        const accessToken = localStorage.getItem('lesta_access_token');
         const nickname = localStorage.getItem('lesta_nickname');
 
-        if (authToken && nickname) {
-            document.getElementById('loginButton').textContent = nickname;
-            document.getElementById('loginButton').href = 'profile.html';
+        if (accessToken && nickname) {
+            // Меняем кнопку "Вход" на никнейм
+            const loginButton = document.getElementById('loginButton');
+            loginButton.textContent = nickname;
+            loginButton.href = 'profile.html';
 
             // Показываем уведомление об успешном входе
             const urlParams = new URLSearchParams(window.location.search);
@@ -129,6 +131,9 @@
             }
         }
     }
+
+    // Инициализация проверки при загрузке
+    document.addEventListener('DOMContentLoaded', checkAuth);
 
     // Обработчик кнопки входа
     document.getElementById('loginButton').addEventListener('click', function(e) {
@@ -415,6 +420,29 @@
                 document.getElementById('resultLabel').innerHTML = resultText;
             });
     }
+
+    // Обработчик сообщений от окна авторизации
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'lesta_auth_success') {
+            localStorage.setItem('lesta_auth', JSON.stringify(event.data.data));
+            updateAuthUI();
+            alert('Авторизация успешна!');
+        } else if (event.data.type === 'lesta_auth_failed') {
+            alert('Ошибка авторизации');
+        }
+    });
+
+    // Обновление интерфейса при загрузке
+    function updateAuthUI() {
+        const authData = JSON.parse(localStorage.getItem('lesta_auth'));
+        if (authData) {
+            document.getElementById('loginButton').textContent = authData.nickname;
+            document.getElementById('loginButton').href = 'profile.html';
+        }
+    }
+
+    // Проверяем авторизацию при загрузке
+    document.addEventListener('DOMContentLoaded', updateAuthUI);
 </script>
 </body>
 </html>
