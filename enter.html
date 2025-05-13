@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
-    <title>LestaAPI - Статистика игроков</title>
+    <title>LestaAPI - Вход</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,7 +23,11 @@
 <hr>
 
 <main>
-
+    <div class="container text-center mt-5">
+        <h2>Вход через Lesta Games</h2>
+        <p>Вы будете перенаправлены на официальный сайт для авторизации</p>
+        <button id="loginBtn" class="btn btn-primary">Войти через Lesta ID</button>
+    </div>
 </main>
 
 <hr>
@@ -34,27 +38,40 @@
 </footer>
 
 <script>
-    // Функция для выполнения входа
-    function login() {
-    const url = 'https://api.tanki.su/wot/auth/login/?language=ru&application_id=1377836fd8c2ecb2382bb3dd08d1f071';
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        const YOUR_API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
+        const redirectUri = `https://pycharm5.github.io/LestaAPI/`;
+        const authUrl = `https://api.tanki.su/wot/auth/login/?application_id=${YOUR_API_KEY}&redirect_uri=${redirectUri}`;
+        window.location.href = authUrl;
+    });
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка сети');
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(JSON.stringify(data, null, 2)); // Выводим JSON в alert
-        })
-        .catch(error => {
-            alert('Ошибка: ' + error.message);
-        });
+    // Проверяем параметры URL после возвращения с авторизации
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        const fragmentParams = new URLSearchParams(window.location.hash.substring(1));
+
+        const accessToken = params.get('access_token') || fragmentParams.get('access_token');
+        const nickname = params.get('nickname') || fragmentParams.get('nickname');
+
+        return { accessToken, nickname };
     }
 
-    // Вызов функции входа
-    login();
+    // При загрузке страницы проверяем параметры авторизации
+    window.addEventListener('DOMContentLoaded', () => {
+        const { accessToken, nickname } = getUrlParams();
+
+        if (accessToken && nickname) {
+            // Сохраняем данные в localStorage
+            localStorage.setItem('lesta_access_token', accessToken);
+            localStorage.setItem('lesta_nickname', nickname);
+
+            // Показываем данные пользователя
+            alert(`Успешный вход!\nНикнейм: ${nickname}\nAccess Token: ${accessToken}`);
+
+            // Перенаправляем на главную страницу
+            window.location.href = 'index.html';
+        }
+    });
 </script>
 </body>
 </html>
