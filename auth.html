@@ -3,24 +3,29 @@
 <head>
     <title>Обработка авторизации</title>
     <script>
-        function parseHashParams() {
-            const hash = window.location.hash.substring(1);
-            const params = new URLSearchParams(hash);
+      function parseHashParams() {
+          const hash = window.location.hash.substring(1);
+          const params = new URLSearchParams(hash);
 
-            if (params.has('access_token') && params.has('nickname')) {
-                localStorage.setItem('lesta_access_token', params.get('access_token'));
-                localStorage.setItem('lesta_nickname', params.get('nickname'));
-                localStorage.setItem('lesta_account_id', params.get('account_id'));
+          if (params.get('status') === 'ok') {
+              const authData = {
+                  access_token: params.get('access_token'),
+                  nickname: params.get('nickname'),
+                  account_id: params.get('account_id'),
+                  expires_at: params.get('expires_at')
+              };
 
-                // Перенаправляем на главную с флагом успешной авторизации
-                window.location.href = 'index.html?auth=success';
-            } else {
-                window.location.href = 'index.html?auth=failed';
-            }
-        }
+              localStorage.setItem('lesta_auth', JSON.stringify(authData));
+              window.opener.postMessage({ type: 'lesta_auth_success', data: authData }, '*');
+              window.close();
+          } else {
+              window.opener.postMessage({ type: 'lesta_auth_failed' }, '*');
+              window.close();
+          }
+      }
 
-        window.addEventListener('DOMContentLoaded', parseHashParams);
-    </script>
+      window.addEventListener('DOMContentLoaded', parseHashParams);
+  </script>
 </head>
 <body>
     <p>Пожалуйста, подождите, идёт обработка авторизации...</p>
