@@ -3,563 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Статистика WoT Blitz</title>
+    <title>Профиль игрока</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .profile-header {
-            background-color: #f8f9fa;
+        .stat-card {
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-        }
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid #fff;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .stat-card {
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        }
-        .badge-custom {
-            font-size: 0.9rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-        .nav-tabs .nav-link.active {
-            font-weight: bold;
-            border-bottom: 3px solid #0d6efd;
-        }
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .tank-image {
-            width: 80px;
-            height: auto;
-        }
-        .achievement-badge {
-            font-size: 12px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        .achievement-item {
-            width: 300px;
-            margin: 10px;
-            display: inline-block;
-            vertical-align: top;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .achievement-image {
-            width: 100%;
-            height: 100px;
-            object-fit: contain;
-            background-color: #f8f9fa;
-            padding: 10px;
-        }
-        .achievement-name {
-            font-weight: bold;
-            padding: 8px;
-            background-color: #f8f9fa;
-        }
-        .achievement-desc {
-            padding: 8px;
-            font-size: 0.9em;
-        }
-        .achievement-count {
-            padding: 8px;
-            text-align: right;
-            font-weight: bold;
-            color: #0d6efd;
-        }
-        .achievements-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
         }
     </style>
 </head>
 <body>
-<header class="header">
-    <a href="index.html" class="btn btn-">Главная</a>
-    <a href="#" class="btn btn-" id="loginButton">Вход</a>
-    <a href="profile.html" class="btn btn-">Профиль</a>
-    <a href="exit.html" class="btn btn-">Выход</a>
-</header>
-
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" id="player-search" class="form-control" placeholder="Введите никнейм">
-                <button class="btn btn-primary" id="search-button">Поиск</button>
-            </div>
+    <div class="container py-4">
+        <div id="authWarning" class="alert alert-warning" style="display:none;">
+            Для просмотра профиля необходимо авторизоваться
         </div>
-    </div>
 
-    <div class="profile-header d-flex flex-column flex-md-row align-items-center" id="profile-header"
-         style="display: none;">
-        <div class="flex-grow-1">
-            <div class="d-flex flex-wrap align-items-center mb-2">
-                <h1 id="player-nickname" class="h3 mb-0 me-2"></h1>
-                <span id="player-level" class="badge bg-primary badge-custom"></span>
-            </div>
+        <div id="profileContent" style="display:none;">
+            <h1 class="text-center mb-4" id="playerNickname"></h1>
 
             <div class="row">
-                <div class="col-6 col-md-3 mb-2 mb-md-0">
-                    <div id="player-wins" class="fw-bold">0</div>
-                    <div class="small text-muted">Побед</div>
+                <div class="col-md-6">
+                    <div class="stat-card bg-light">
+                        <h3>Основная статистика</h3>
+                        <div id="basicStats"></div>
+                    </div>
                 </div>
-                <div class="col-6 col-md-3 mb-2 mb-md-0">
-                    <div id="player-losses" class="fw-bold">0</div>
-                    <div class="small text-muted">Поражений</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div id="player-winrate" class="fw-bold">0%</div>
-                    <div class="small text-muted">Winrate</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div id="player-battles" class="fw-bold">0</div>
-                    <div class="small text-muted">Игр всего</div>
+                <div class="col-md-6">
+                    <div class="stat-card bg-light">
+                        <h3>Боевая эффективность</h3>
+                        <div id="performanceStats"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button"
-                    role="tab">Статистика
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements"
-                    type="button" role="tab">Достижения
-            </button>
-        </li>
-    </ul>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('lesta_access_token');
+            const accountId = localStorage.getItem('lesta_account_id');
+            const nickname = localStorage.getItem('lesta_nickname');
 
-    <div class="tab-content" id="profileTabsContent">
-        <div class="tab-pane fade show active" id="stats" role="tabpanel">
-            <div id="loading-stats" class="loading-spinner">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
-                </div>
-                <p class="mt-2">Загрузка статистики...</p>
-            </div>
-            <div id="stats-content" style="display: none;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="stat-card bg-light">
-                            <h5 class="h6 mb-3">Общая статистика</h5>
-                            <div class="row">
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Средний урон</div>
-                                    <div id="avg-damage" class="fw-bold">0</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Средний опыт</div>
-                                    <div id="avg-xp" class="fw-bold">0</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Победы подряд</div>
-                                    <div id="max-win-streak" class="fw-bold">0</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">KDR</div>
-                                    <div id="kdr" class="fw-bold">0</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="stat-card bg-light">
-                            <h5 class="h6 mb-3">Эффективность</h5>
-                            <div class="row">
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Процент попаданий</div>
-                                    <div id="hit-rate" class="fw-bold">0%</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Выживаемость</div>
-                                    <div id="survival-rate" class="fw-bold">0%</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Макс. фрагов</div>
-                                    <div id="max-frags" class="fw-bold">0</div>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <div class="small text-muted">Очки захвата</div>
-                                    <div id="capture-points" class="fw-bold">0</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            if (!token || !accountId || !nickname) {
+                document.getElementById('authWarning').style.display = 'block';
+                setTimeout(() => window.location.href = 'enter.html', 2000);
+                return;
+            }
 
-         <div class="tab-pane fade" id="achievements" role="tabpanel">
-            <div id="loading-achievements" class="loading-spinner">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
-                </div>
-                <p class="mt-2">Загрузка достижений...</p>
-            </div>
-            <div id="achievements-content" class="achievements-grid" style="display: none;">
-                <!-- Достижения будут загружены здесь -->
-            </div>
-        </div>
-    </div>
-</div>
+            // Показываем профиль
+            document.getElementById('profileContent').style.display = 'block';
+            document.getElementById('playerNickname').textContent = nickname;
 
-<footer>
-    © Леста Игры, 2022–2025. Игры «Мир танков», «Мир кораблей», Tanks Blitz основаны на интеллектуальной собственности
-    третьих лиц. Все права на объекты прав третьих лиц принадлежат их законным правообладателям.
-</footer>
+            // Загружаем статистику
+            await loadPlayerStats(accountId);
+        });
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Проверка авторизации
-    document.addEventListener('DOMContentLoaded', function() {
-        const accessToken = localStorage.getItem('lesta_access_token');
-        const nickname = localStorage.getItem('lesta_nickname');
+        async function loadPlayerStats(accountId) {
+            try {
+                const APP_ID = "1377836fd8c2ecb2382bb3dd08d1f071";
+                const response = await fetch(
+                    `https://api.tanki.su/wotb/account/info/?application_id=${APP_ID}&account_id=${accountId}&fields=statistics.all`
+                );
 
-        if (!accessToken || !nickname) {
-            alert('Для доступа к профилю необходимо авторизоваться');
-            window.location.href = 'enter.html';
-        } else {
-            // Автоматически загружаем статистику пользователя
-            document.getElementById('player-search').value = nickname;
-            document.getElementById('search-button').click();
+                if (!response.ok) throw new Error('Ошибка сервера');
 
-            // Показываем данные пользователя
-            alert(`Текущий пользователь:\nНикнейм: ${nickname}\nAccount ID: ${localStorage.getItem('lesta_account_id')}`);
-        }
-    });
+                const data = await response.json();
+                const stats = data.data[accountId].statistics.all;
 
+                // Форматируем статистику
+                const battles = stats.battles || 0;
+                const wins = stats.wins || 0;
+                const winRate = battles > 0 ? (wins / battles * 100).toFixed(2) : 0;
+                const avgDamage = battles > 0 ? Math.round(stats.damage_dealt / battles) : 0;
+                const avgXp = battles > 0 ? Math.round(stats.xp / battles) : 0;
 
-    // Конфигурация
-    const config = {
-    applicationId: '1377836fd8c2ecb2382bb3dd08d1f071', // Замените на свой application_id
-    region: 'ru',
-    language: 'ru'
-    };
-
-    // Проверка авторизации
-    document.addEventListener('DOMContentLoaded', function() {
-        const authData = JSON.parse(localStorage.getItem('lesta_auth'));
-
-        if (!authData || !authData.access_token) {
-            alert('Для доступа к профилю необходимо авторизоваться');
-            window.location.href = 'enter.html';
-        } else {
-            document.getElementById('player-search').value = authData.nickname;
-            document.getElementById('search-button').click();
-
-            alert(`Текущий пользователь:\nНикнейм: ${authData.nickname}\nAccount ID: ${authData.account_id}`);
-        }
-    });
-
-    // DOM элементы
-    const elements = {
-    playerSearch: document.getElementById('player-search'),
-    searchButton: document.getElementById('search-button'),
-    profileHeader: document.getElementById('profile-header'),
-    playerAvatar: document.getElementById('player-avatar'),
-    playerNickname: document.getElementById('player-nickname'),
-    playerLevel: document.getElementById('player-level'),
-    playerWins: document.getElementById('player-wins'),
-    playerLosses: document.getElementById('player-losses'),
-    playerWinrate: document.getElementById('player-winrate'),
-    playerBattles: document.getElementById('player-battles'),
-    avgDamage: document.getElementById('avg-damage'),
-    avgXp: document.getElementById('avg-xp'),
-    maxWinStreak: document.getElementById('max-win-streak'),
-    kdr: document.getElementById('kdr'),
-    hitRate: document.getElementById('hit-rate'),
-    survivalRate: document.getElementById('survival-rate'),
-    maxFrags: document.getElementById('max-frags'),
-    capturePoints: document.getElementById('capture-points'),
-    achievementsContent: document.getElementById('achievements-content'),
-    loadingStats: document.getElementById('loading-stats'),
-    statsContent: document.getElementById('stats-content'),
-    loadingAchievements: document.getElementById('loading-achievements')
-    };
-
-
-    // Проверка авторизации
-    if (!localStorage.getItem('lesta_access_token')) {
-        alert('Для доступа к профилю необходимо авторизоваться');
-        window.location.href = 'enter.html';
-    } else {
-        // Автозагрузка статистики
-        const nickname = localStorage.getItem('lesta_nickname');
-        document.getElementById('player-search').value = nickname;
-        document.getElementById('search-button').click();
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const accessToken = localStorage.getItem('lesta_access_token');
-        const nickname = localStorage.getItem('lesta_nickname');
-        const accountId = localStorage.getItem('lesta_account_id');
-
-    if (!accessToken || !nickname) {
-        alert('Пожалуйста, войдите в систему');
-        window.location.href = 'enter.html';
-    } else {
-        // Автоматически загружаем статистику пользователя
-        document.getElementById('player-search').value = nickname;
-        document.getElementById('search-button').click();
-
-        // Показываем данные пользователя
-        alert(`Текущий пользователь:\nНикнейм: ${nickname}\nAccount ID: ${accountId}\nAccess Token: ${accessToken}`);
-    }
-});
-
-    // Инициализация
-    document.addEventListener('DOMContentLoaded', () => {
-    elements.searchButton.addEventListener('click', searchPlayer);
-    elements.playerSearch.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') searchPlayer();
-    });
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const accountId = urlParams.get('account_id');
-    if (accountId) {
-        loadPlayerData(accountId);
-    }
-    });
-
-    // Поиск игрока по никнейму
-    async function searchPlayer() {
-    const nickname = elements.playerSearch.value.trim();
-    if (!nickname) return;
-
-    try {
-        const accountId = await findAccountId(nickname);
-        if (accountId) {
-            window.history.pushState({}, '', `?account_id=${accountId}`);
-            loadPlayerData(accountId);
-        } else {
-            alert('Игрок не найден');
-        }
-    } catch (error) {
-        console.error('Ошибка поиска:', error);
-        alert('Ошибка при поиске игрока');
-    }
-    }
-
-    // API запросы
-
-    /**
-    * Поиск ID аккаунта по никнейму
-    * Запрос: GET https://papi.tanksblitz.ru/wotb/account/list/
-    */
-    async function findAccountId(nickname) {
-    const response = await fetch(
-        `https://papi.tanksblitz.ru/wotb/account/list/?application_id=${config.applicationId}&search=${encodeURIComponent(nickname)}&limit=1`
-    );
-    const data = await response.json();
-    return data.data?.[0]?.account_id || null;
-    }
-
-    /**
-    * Получение основной информации об аккаунте
-    * Запрос: GET https://papi.tanksblitz.ru/wotb/account/info/
-    */
-    async function fetchAccountInfo(accountId) {
-    const response = await fetch(
-        `https://papi.tanksblitz.ru/wotb/account/info/?application_id=${config.applicationId}&account_id=${accountId}`
-    );
-    const data = await response.json();
-    return data.data?.[accountId] || null;
-    }
-
-    /**
-    * Получение статистики игрока (включена в account/info)
-    * Запрос: GET https://papi.tanksblitz.ru/wotb/account/info/
-    */
-    async function fetchPlayerStatistics(accountId) {
-    const response = await fetch(
-        `https://papi.tanksblitz.ru/wotb/account/info/?application_id=${config.applicationId}&account_id=${accountId}`
-    );
-    const data = await response.json();
-    return data.data?.[accountId]?.statistics?.all || {};
-    }
-
-    /**
-    * Получение достижений игрока
-    * Запрос: GET https://papi.tanksblitz.ru/wotb/account/achievements/
-    */
-    async function fetchPlayerAchievements(accountId) {
-    const response = await fetch(
-        `https://papi.tanksblitz.ru/wotb/account/achievements/?application_id=${config.applicationId}&account_id=${accountId}`
-    );
-    const data = await response.json();
-    return data.data?.[accountId]?.achievements || {};
-    }
-
-    // Обновление интерфейса
-    function updateAccountInfo(accountInfo) {
-    elements.playerNickname.textContent = accountInfo.nickname || 'Неизвестно';
-    elements.profileHeader.style.display = 'flex';
-
-    if (accountInfo.last_battle_time) {
-        const lastBattle = new Date(accountInfo.last_battle_time * 1000);
-        elements.playerLevel.textContent = `Последний бой: ${lastBattle.toLocaleDateString()}`;
-    }
-    }
-
-    function updateStatistics(stats) {
-    const battles = stats.battles || 1;
-    const wins = stats.wins || 0;
-    const winrate = Math.round((wins / battles) * 100);
-    const avgDamage = Math.round(stats.damage_dealt / battles);
-    const avgXp = Math.round(stats.xp / battles);
-    const hitRate = stats.shots ? Math.round((stats.hits / stats.shots) * 100) : 0;
-    const survivalRate = Math.round((stats.survived_battles / battles) * 100);
-    const kdr = stats.damage_received ? (stats.frags / (stats.damage_received / 1000)).toFixed(2) : 0;
-
-    elements.playerWins.textContent = wins;
-    elements.playerLosses.textContent = stats.losses || 0;
-    elements.playerBattles.textContent = battles;
-    elements.playerWinrate.textContent = `${winrate}%`;
-    elements.avgDamage.textContent = avgDamage;
-    elements.avgXp.textContent = avgXp;
-    elements.maxWinStreak.textContent = stats.max_win_streak || 0;
-    elements.kdr.textContent = kdr;
-    elements.hitRate.textContent = `${hitRate}%`;
-    elements.survivalRate.textContent = `${survivalRate}%`;
-    elements.maxFrags.textContent = stats.max_frags || 0;
-    elements.capturePoints.textContent = stats.capture_points || 0;
-    }
-
-    async function updateAchievements(achievements) {
-    try {
-        // Сначала загружаем информацию о всех достижениях
-        const achievementsInfo = await fetchAchievementsInfo();
-
-        let html = '';
-
-        // Сортируем достижения по количеству (от большего к меньшему)
-        const sortedAchievements = Object.entries(achievements)
-            .filter(([key, value]) => value > 0)
-            .sort((a, b) => b[1] - a[1]);
-
-        if (sortedAchievements.length === 0) {
-            html = '<div class="col-12 text-muted">Достижения не найдены</div>';
-        } else {
-            for (const [achievementId, count] of sortedAchievements) {
-                const achievementInfo = achievementsInfo.data[achievementId];
-
-                if (!achievementInfo) continue;
-
-                // Обработка достижений с несколькими степенями (options)
-                let imageUrl, name, description;
-
-                if (achievementInfo.options) {
-                    // Для достижений с несколькими степенями берем последнюю (наивысшую)
-                    const lastOption = achievementInfo.options[achievementInfo.options.length - 1];
-                    imageUrl = lastOption.image_big || lastOption.image;
-                    name = lastOption.name;
-                    description = lastOption.description;
-                } else {
-                    imageUrl = achievementInfo.image_big || achievementInfo.image;
-                    name = achievementInfo.name;
-                    description = achievementInfo.description;
-                }
-
-                // Проверяем URL изображения
-                if (imageUrl) {
-                    // Исправляем URL если нужно
-                    if (imageUrl.startsWith('http://')) {
-                        imageUrl = imageUrl.replace('http://', 'https://');
-                    }
-                    if (!imageUrl.startsWith('http')) {
-                        imageUrl = 'https://glossary-static-cdn.lesta.ru' + imageUrl;
-                    }
-                }
-
-                // Очищаем описание от лишних символов
-                description = description.replace(/•/g, '').trim();
-
-                html += `
-                    <div class="achievement-item">
-                        <div class="achievement-image-container">
-                            <img src="${imageUrl}" alt="${name}" class="achievement-image"
-                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/300x100?text=Image+Error'">
-                        </div>
-                        <div class="achievement-name">${name.split('(')[0].trim()}</div>
-                        <div class="achievement-desc">${description}</div>
-                        <div class="achievement-count">${count} раз</div>
-                    </div>
+                // Отображаем статистику
+                document.getElementById('basicStats').innerHTML = `
+                    <p>Боев: <strong>${battles}</strong></p>
+                    <p>Побед: <strong>${wins}</strong></p>
+                    <p>Процент побед: <strong>${winRate}%</strong></p>
                 `;
+
+                document.getElementById('performanceStats').innerHTML = `
+                    <p>Средний урон: <strong>${avgDamage}</strong></p>
+                    <p>Средний опыт: <strong>${avgXp}</strong></p>
+                    <p>Уничтожено техники: <strong>${stats.frags || 0}</strong></p>
+                `;
+
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('basicStats').innerHTML =
+                    '<div class="alert alert-danger">Ошибка загрузки статистики</div>';
             }
         }
-
-            elements.achievementsContent.innerHTML = html;
-        } catch (error) {
-            console.error('Ошибка загрузки информации о достижениях:', error);
-            elements.achievementsContent.innerHTML = '<div class="col-12 text-danger">Ошибка загрузки достижений: ' + error.message + '</div>';
-        }
-    }
-
-    /**
-    * Получение информации о всех достижениях игры
-    * Запрос: GET https://papi.tanksblitz.ru/wotb/encyclopedia/achievements/
-    */
-    async function fetchAchievementsInfo() {
-        const response = await fetch(
-            `https://papi.tanksblitz.ru/wotb/encyclopedia/achievements/?application_id=${config.applicationId}`
-        );
-        return await response.json();
-    }
-
-    // Основная функция загрузки данных
-    async function loadPlayerData(accountId) {
-    try {
-        // Основная информация
-        const accountInfo = await fetchAccountInfo(accountId);
-        if (!accountInfo) throw new Error('Аккаунт не найден');
-        updateAccountInfo(accountInfo);
-
-        // Статистика
-        showLoading(elements.loadingStats, elements.statsContent);
-        const statistics = await fetchPlayerStatistics(accountId);
-        updateStatistics(statistics);
-        hideLoading(elements.loadingStats, elements.statsContent);
-
-        // Достижения
-        showLoading(elements.loadingAchievements, elements.achievementsContent);
-        const achievements = await fetchPlayerAchievements(accountId);
-        updateAchievements(achievements);
-        hideLoading(elements.loadingAchievements, elements.achievementsContent);
-
-    } catch (error) {
-        console.error('Ошибка загрузки:', error);
-        alert('Ошибка загрузки данных: ' + error.message);
-    }
-    }
-
-    // Вспомогательные функции
-    function showLoading(loaderElement, contentElement) {
-    loaderElement.style.display = 'block';
-    contentElement.style.display = 'none';
-    }
-
-    function hideLoading(loaderElement, contentElement) {
-    loaderElement.style.display = 'none';
-    contentElement.style.display = 'block';
-    }
-</script>
+    </script>
 </body>
 </html>
