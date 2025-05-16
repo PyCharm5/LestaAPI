@@ -3,31 +3,43 @@
 <head>
     <title>Обработка авторизации</title>
     <script>
-      function parseHashParams() {
-          const hash = window.location.hash.substring(1);
-          const params = new URLSearchParams(hash);
+        // Получаем параметры из URL
+        function getAuthData() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return null;
 
-          if (params.get('status') === 'ok') {
-              const authData = {
-                  access_token: params.get('access_token'),
-                  nickname: params.get('nickname'),
-                  account_id: params.get('account_id'),
-                  expires_at: params.get('expires_at')
-              };
+            const params = new URLSearchParams(hash);
+            return {
+                access_token: params.get('access_token'),
+                account_id: params.get('account_id'),
+                nickname: params.get('nickname'),
+                expires_at: params.get('expires_at')
+            };
+        }
 
-              localStorage.setItem('lesta_auth', JSON.stringify(authData));
-              window.opener.postMessage({ type: 'lesta_auth_success', data: authData }, '*');
-              window.close();
-          } else {
-              window.opener.postMessage({ type: 'lesta_auth_failed' }, '*');
-              window.close();
-          }
-      }
+        // Отправляем данные в основное окно
+        function sendAuthData() {
+            const authData = getAuthData();
+            if (authData && authData.access_token) {
+                window.opener.postMessage({
+                    type: 'lesta_auth_success',
+                    ...authData
+                }, '*');
+            } else {
+                window.opener.postMessage({
+                    type: 'lesta_auth_failed'
+                }, '*');
+            }
+            window.close();
+        }
 
-      window.addEventListener('DOMContentLoaded', parseHashParams);
-  </script>
+        // Вызываем при загрузке
+        window.onload = sendAuthData;
+    </script>
 </head>
 <body>
-    <p>Пожалуйста, подождите, идёт обработка авторизации...</p>
+    <div style="text-align: center; margin-top: 50px;">
+        <h3>Завершение авторизации...</h3>
+    </div>
 </body>
 </html>
