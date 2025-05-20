@@ -3,12 +3,8 @@
 <head>
     <title>Обработка авторизации</title>
     <script>
-        // Получаем параметры из URL
         function getAuthData() {
-            const hash = window.location.hash.substring(1);
-            if (!hash) return null;
-
-            const params = new URLSearchParams(hash);
+            const params = new URLSearchParams(window.location.search);
             return {
                 access_token: params.get('access_token'),
                 account_id: params.get('account_id'),
@@ -17,29 +13,39 @@
             };
         }
 
-        // Отправляем данные в основное окно
         function sendAuthData() {
             const authData = getAuthData();
             if (authData && authData.access_token) {
-                window.opener.postMessage({
-                    type: 'lesta_auth_success',
-                    ...authData
-                }, '*');
+                alert(`Access Token: ${authData.access_token}`); // Вывод access_token в alert
+                // Здесь вы можете отправить данные на сервер, если это необходимо
+                fetch('/auth_callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(authData)
+                }).then(response => {
+                    if (response.ok) {
+                        window.opener.postMessage({ type: 'auth_complete' }, '*');
+                        window.close();
+                    } else {
+                        window.opener.postMessage({ type: 'auth_failed' }, '*');
+                        window.location.href = "/enter?error=auth_failed";
+                    }
+                });
             } else {
-                window.opener.postMessage({
-                    type: 'lesta_auth_failed'
-                }, '*');
+                window.opener.postMessage({ type: 'auth_failed' }, '*');
+                window.location.href = "/enter?error=no_token";
             }
-            window.close();
         }
 
-        // Вызываем при загрузке
         window.onload = sendAuthData;
     </script>
 </head>
 <body>
     <div style="text-align: center; margin-top: 50px;">
         <h3>Завершение авторизации...</h3>
+        <p>Пожалуйста, подождите</p>
     </div>
 </body>
 </html>
