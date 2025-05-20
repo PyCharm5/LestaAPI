@@ -1,295 +1,286 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <title>LestaAPI - Статистика игроков</title>
-    <style>
-        .module { display: none; }
-        .module.active { display: block; }
-        .tank-item, .clan-item {
-            cursor: pointer;
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .tank-item:hover, .clan-item:hover {
-            background-color: #f5f5f5;
-        }
-        #resultLabel {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Статистика игроков{% endblock %}
 
-<header class="header p-3 bg-light">
-    <a href="index.html" class="btn btn-outline-primary">Главная</a>
-    <a href="enter.html" class="btn btn-outline-primary" id="loginButton">Вход</a>
-    <a href="profile.html" class="btn btn-outline-primary">Профиль</a>
-    <a href="exit.html" class="btn btn-outline-danger">Выход</a>
-</header>
-
+{% block content %}
 <nav class="nav nav-pills p-3">
     <button id="playerSearchNav" class="btn btn-primary me-2">Поиск игрока</button>
     <button id="tankSearchNav" class="btn btn-primary me-2">Поиск танка</button>
     <button id="clanSearchNav" class="btn btn-primary">Поиск клана</button>
 </nav>
 
-<main class="container mt-4">
-    <div id="playerSearch" class="module active">
-        <h2>Поиск игрока</h2>
-        <div class="input-group mb-3">
-            <input type="text" id="nickname" class="form-control" placeholder="Введите никнейм или ID">
-            <button id="searchButton" class="btn btn-success">Поиск</button>
-        </div>
-        <div class="result" id="resultLabel"></div>
+<div id="playerSearch" class="module active">
+    <h2>Поиск игрока</h2>
+    <div class="input-group mb-3">
+        <input type="text" id="nickname" class="form-control" placeholder="Введите никнейм или ID">
+        <button id="searchButton" class="btn btn-success">Поиск</button>
     </div>
+    <div class="result" id="resultLabel"></div>
+</div>
 
-    <div id="tankSearch" class="module">
-        <h2>Поиск танка</h2>
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <select id="nation" class="form-select">
-                    <option value="">Все нации</option>
-                    <option value="ussr">СССР</option>
-                    <option value="germany">Германия</option>
-                    <option value="usa">США</option>
-                    <option value="france">Франция</option>
-                    <option value="uk">Великобритания</option>
-                    <option value="china">Китай</option>
-                    <option value="japan">Япония</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select id="tier" class="form-select">
-                    <option value="">Все уровни</option>
-                    <option value="1">I</option>
-                    <option value="2">II</option>
-                    <option value="3">III</option>
-                    <option value="4">IV</option>
-                    <option value="5">V</option>
-                    <option value="6">VI</option>
-                    <option value="7">VII</option>
-                    <option value="8">VIII</option>
-                    <option value="9">IX</option>
-                    <option value="10">X</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select id="type" class="form-select">
-                    <option value="">Все типы</option>
-                    <option value="lightTank">Лёгкий</option>
-                    <option value="mediumTank">Средний</option>
-                    <option value="heavyTank">Тяжёлый</option>
-                    <option value="AT-SPG">ПТ-САУ</option>
-                </select>
-            </div>
+<div id="tankSearch" class="module">
+    <h2>Поиск танка</h2>
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <select id="nation" class="form-select">
+                <option value="">Все нации</option>
+                <option value="ussr">СССР</option>
+                <option value="germany">Германия</option>
+                <option value="usa">США</option>
+                <option value="france">Франция</option>
+                <option value="uk">Великобритания</option>
+                <option value="china">Китай</option>
+                <option value="japan">Япония</option>
+            </select>
         </div>
-        <button id="searchTankButton" class="btn btn-success mb-3">Поиск танков</button>
-        <div class="row" id="tankList"></div>
-        <div class="card mt-3" id="tankInfo" style="display:none;">
-            <div class="card-body"></div>
+        <div class="col-md-4">
+            <select id="tier" class="form-select">
+                <option value="">Все уровни</option>
+                <option value="1">I</option>
+                <option value="2">II</option>
+                <option value="3">III</option>
+                <option value="4">IV</option>
+                <option value="5">V</option>
+                <option value="6">VI</option>
+                <option value="7">VII</option>
+                <option value="8">VIII</option>
+                <option value="9">IX</option>
+                <option value="10">X</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select id="tankType" class="form-select">
+                <option value="">Все типы</option>
+                <option value="lightTank">Лёгкий</option>
+                <option value="mediumTank">Средний</option>
+                <option value="heavyTank">Тяжёлый</option>
+                <option value="AT-SPG">ПТ-САУ</option>
+            </select>
         </div>
     </div>
+    <button id="searchTankButton" class="btn btn-success">Поиск</button>
+    <div class="tank-info" id="tankInfo" style="display: none;"></div>
+    <div class="tank-list mt-3" id="tankList"></div>
+</div>
 
-    <div id="clanSearch" class="module">
-        <h2>Поиск клана</h2>
-        <div class="input-group mb-3">
-            <input type="text" id="clanSearchInput" class="form-control" placeholder="Введите тег или название клана">
-            <button id="searchClanButton" class="btn btn-success">Поиск</button>
-        </div>
-        <div id="clanList" class="mb-3"></div>
-        <div class="card" id="clanInfo" style="display:none;">
-            <div class="card-body"></div>
-        </div>
+<div id="clanSearch" class="module">
+    <h2>Поиск клана</h2>
+    <div class="input-group mb-3">
+        <input type="text" id="clanQuery" class="form-control" placeholder="Введите тег или название клана">
+        <button id="searchClanButton" class="btn btn-success">Поиск</button>
     </div>
-</main>
+    <div class="clan-info" id="clanInfo" style="display: none;"></div>
+    <div class="clan-list mt-3" id="clanList"></div>
+</div>
 
+{% block scripts %}
 <script>
-    // Конфигурация
-    const API_KEY = "1377836fd8c2ecb2382bb3dd08d1f071";
-    const API_URL = "https://papi.tanksblitz.ru/wotb";
+    // Переключение между модулями
+    document.querySelectorAll('nav button').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.module').forEach(module => {
+                module.classList.remove('active');
+            });
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
 
-    // Проверка авторизации при загрузке
-    document.addEventListener('DOMContentLoaded', function() {
-        const nickname = localStorage.getItem('lesta_nickname');
-        if (nickname) {
-            document.getElementById('loginButton').textContent = nickname;
-        }
-
-        // Инициализация обработчиков
-        initEventListeners();
+            const targetId = this.id.replace('Nav', '');
+            document.getElementById(targetId).classList.add('active');
+        });
     });
 
-    function initEventListeners() {
-        // Навигация
-        document.getElementById('playerSearchNav').addEventListener('click', () => showModule('playerSearch'));
-        document.getElementById('tankSearchNav').addEventListener('click', () => showModule('tankSearch'));
-        document.getElementById('clanSearchNav').addEventListener('click', () => showModule('clanSearch'));
+    // Поиск игрока
+    document.getElementById('searchButton').addEventListener('click', searchPlayer);
 
-        // Поиск игрока
-        document.getElementById('searchButton').addEventListener('click', searchPlayer);
-
-        // Поиск танка
-        document.getElementById('searchTankButton').addEventListener('click', searchTank);
-
-        // Поиск клана
-        document.getElementById('searchClanButton').addEventListener('click', searchClan);
-    }
-
-    function showModule(moduleId) {
-        document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-        document.getElementById(moduleId).classList.add('active');
-    }
-
-    // ========== Поиск игрока ==========
-    async function searchPlayer() {
-        const nickname = document.getElementById('nickname').value.trim();
+    function searchPlayer() {
+        const nickname = document.getElementById('nickname').value;
         if (!nickname) {
-            alert("Введите никнейм игрока");
+            alert('Введите никнейм игрока');
             return;
         }
 
-        try {
-            const response = await fetch(`${API_URL}/account/list/?application_id=${API_KEY}&search=${encodeURIComponent(nickname)}`);
-            const data = await response.json();
-
-            if (data.data && data.data.length > 0) {
-                const accountId = data.data[0].account_id;
-                getPlayerStatistics(accountId);
-            } else {
-                document.getElementById('resultLabel').innerHTML = '<div class="alert alert-warning">Игрок не найден</div>';
-            }
-        } catch (error) {
-            console.error("Ошибка поиска игрока:", error);
-            document.getElementById('resultLabel').innerHTML = '<div class="alert alert-danger">Ошибка при поиске игрока</div>';
-        }
+        fetch(`/api/search_player?nickname=${encodeURIComponent(nickname)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultLabel').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    document.getElementById('resultLabel').innerHTML = `
+                        <div class="alert alert-success">
+                            <p>Боев: ${data.battles}</p>
+                            <p>Побед: ${data.wins}</p>
+                            <p>Процент побед: ${data.win_rate.toFixed(2)}%</p>
+                            <p>Средний урон: ${Math.round(data.avg_damage)}</p>
+                            <p>Макс. уничтожено за бой: ${data.max_frags}</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultLabel').innerHTML = `<div class="alert alert-danger">Ошибка: ${error.message}</div>`;
+            });
     }
 
-    async function getPlayerStatistics(accountId) {
-        try {
-            const response = await fetch(`${API_URL}/account/info/?application_id=${API_KEY}&account_id=${accountId}&fields=statistics.all`);
-            const data = await response.json();
+    // Поиск танков
+    document.getElementById('searchTankButton').addEventListener('click', searchTanks);
 
-            const stats = data.data[accountId].statistics.all;
-            const battles = stats.battles || 0;
-            const wins = stats.wins || 0;
-            const winRate = battles > 0 ? (wins / battles * 100).toFixed(2) : 0;
-            const avgDamage = battles > 0 ? Math.round(stats.damage_dealt / battles) : 0;
-
-            const resultHTML = `
-                <div class="alert alert-success">
-                    <h4>Статистика игрока</h4>
-                    <p>Боев: <strong>${battles}</strong></p>
-                    <p>Побед: <strong>${wins}</strong> (${winRate}%)</p>
-                    <p>Средний урон: <strong>${avgDamage}</strong></p>
-                    <p>Макс. уничтожено за бой: <strong>${stats.max_frags || 0}</strong></p>
-                </div>
-            `;
-
-            document.getElementById('resultLabel').innerHTML = resultHTML;
-        } catch (error) {
-            console.error("Ошибка получения статистики:", error);
-            document.getElementById('resultLabel').innerHTML = '<div class="alert alert-danger">Ошибка загрузки статистики</div>';
-        }
-    }
-
-    // ========== Поиск танка ==========
-    async function searchTank() {
+    function searchTanks() {
         const nation = document.getElementById('nation').value;
         const tier = document.getElementById('tier').value;
-        const type = document.getElementById('type').value;
+        const type = document.getElementById('tankType').value;
 
-        try {
-            const response = await fetch(`${API_URL}/encyclopedia/vehicles/?application_id=${API_KEY}`);
-            const data = await response.json();
-
-            if (data.data) {
-                const tanks = Object.values(data.data);
-                const filteredTanks = tanks.filter(tank => {
-                    return (!nation || tank.nation === nation) &&
-                           (!tier || tank.tier.toString() === tier) &&
-                           (!type || tank.type === type);
-                });
-
-                displayTankList(filteredTanks);
-            } else {
-                alert("Танки не найдены");
-            }
-        } catch (error) {
-            console.error("Ошибка поиска танков:", error);
-            alert("Ошибка при поиске танков");
+        let url = `/api/search_tank`;
+        if (nation || tier || type) {
+            url += '?';
+            const params = [];
+            if (nation) params.push(`nation=${nation}`);
+            if (tier) params.push(`tier=${tier}`);
+            if (type) params.push(`type=${type}`);
+            url += params.join('&');
         }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const tankList = document.getElementById('tankList');
+                tankList.innerHTML = '';
+
+                if (data.error) {
+                    tankList.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    data.forEach(tank => {
+                        const tankItem = document.createElement('div');
+                        tankItem.className = 'tank-item card';
+                        tankItem.innerHTML = `
+                            <img src="${tank.images?.preview || '#'}" class="card-img-top" alt="${tank.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${tank.name}</h5>
+                                <p class="card-text">
+                                    Уровень: ${tank.tier}<br>
+                                    Тип: ${getTankTypeName(tank.type)}<br>
+                                    Нация: ${getNationName(tank.nation)}
+                                </p>
+                                <button class="btn btn-sm btn-outline-primary view-tank" data-tank-id="${tank.id}">Подробнее</button>
+                            </div>
+                        `;
+                        tankList.appendChild(tankItem);
+
+                        // Добавьте обработчик для кнопки "Подробнее"
+                        tankItem.querySelector('.view-tank').addEventListener('click', function() {
+                            showTankDetails(tank.id);
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('tankList').innerHTML = `<div class="alert alert-danger">Ошибка: ${error.message}</div>`;
+            });
     }
 
-    function displayTankList(tanks) {
-        const tankList = document.getElementById('tankList');
-        tankList.innerHTML = '';
+    function showTankDetails(tankId) {
+        fetch(`/api/tank_details/${tankId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('tankInfo').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    const tankInfo = document.getElementById('tankInfo');
+                    tankInfo.innerHTML = `
+                        <h3>${data.name}</h3>
+                        <p>Нация: ${data.nation}</p>
+                        <p>Уровень: ${data.tier}</p>
+                        <p>Тип: ${getTankTypeName(data.type)}</p>
+                        <p>Описание: ${data.description}</p>
+                        <p>Средний урон: ${data.avg_damage}</p>
+                        <p>Максимальное количество фрагов: ${data.max_frags}</p>
+                    `;
+                    tankInfo.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('tankInfo').innerHTML = `<div class="alert alert-danger">Ошибка: ${error.message}</div>`;
+            });
+    }
 
-        if (tanks.length === 0) {
-            tankList.innerHTML = '<div class="col-12 alert alert-info">Танки не найдены</div>';
+    // Поиск кланов
+    document.getElementById('searchClanButton').addEventListener('click', searchClans);
+
+    function searchClans() {
+        const query = document.getElementById('clanQuery').value;
+        if (!query) {
+            alert('Введите тег или название клана');
             return;
         }
 
-        tanks.slice(0, 50).forEach(tank => { // Ограничиваем вывод 50 танками
-            const tankCard = document.createElement('div');
-            tankCard.className = 'col-md-3 mb-3 tank-item';
-            tankCard.innerHTML = `
-                <div class="card h-100">
-                    <img src="${tank.images.preview || 'https://via.placeholder.com/300x150?text=No+Image'}"
-                         class="card-img-top" alt="${tank.name}">
-                    <div class="card-body">
-                        <h5 class="card-title">${tank.name}</h5>
-                        <p class="card-text">
-                            Уровень: ${tank.tier}<br>
-                            Тип: ${getTankType(tank.type)}<br>
-                            Нация: ${getNationName(tank.nation)}
-                        </p>
-                    </div>
-                </div>
-            `;
+        fetch(`/api/search_clan?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const clanList = document.getElementById('clanList');
+                clanList.innerHTML = '';
+                document.getElementById('clanInfo').style.display = 'none';
 
-            tankCard.addEventListener('click', () => showTankDetails(tank));
-            tankList.appendChild(tankCard);
-        });
+                if (data.error) {
+                    clanList.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    data.forEach(clan => {
+                        const clanItem = document.createElement('div');
+                        clanItem.className = 'clan-item card';
+                        clanItem.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">[${clan.tag}] ${clan.name}</h5>
+                                <p class="card-text">Участников: ${clan.members_count}</p>
+                                <button class="btn btn-sm btn-outline-primary view-clan" data-clan-id="${clan.clan_id}">Подробнее</button>
+                            </div>
+                        `;
+                        clanList.appendChild(clanItem);
+
+                        // Добавьте обработчик для кнопки "Подробнее"
+                        clanItem.querySelector('.view-clan').addEventListener('click', function() {
+                            showClanDetails(clan.clan_id);
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('clanList').innerHTML = `<div class="alert alert-danger">Ошибка: ${error.message}</div>`;
+            });
     }
 
-    function showTankDetails(tank) {
-        const tankInfo = document.getElementById('tankInfo');
-        tankInfo.style.display = 'block';
-
-        const detailsHTML = `
-            <h3>${tank.name}</h3>
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="${tank.images.normal || tank.images.preview || 'https://via.placeholder.com/300x150?text=No+Image'}"
-                         class="img-fluid" alt="${tank.name}">
-                </div>
-                <div class="col-md-8">
-                    <p><strong>Уровень:</strong> ${tank.tier}</p>
-                    <p><strong>Тип:</strong> ${getTankType(tank.type)}</p>
-                    <p><strong>Нация:</strong> ${getNationName(tank.nation)}</p>
-                    <p><strong>Премиум:</strong> ${tank.is_premium ? 'Да' : 'Нет'}</p>
-                    ${tank.description ? `<p><strong>Описание:</strong> ${tank.description}</p>` : ''}
-                </div>
-            </div>
-        `;
-
-        tankInfo.querySelector('.card-body').innerHTML = detailsHTML;
-        tankInfo.scrollIntoView({ behavior: 'smooth' });
+    function showClanDetails(clanId) {
+        fetch(`/api/clan_details/${clanId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('clanInfo').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    const clanInfo = document.getElementById('clanInfo');
+                    clanInfo.innerHTML = `
+                        <h3>${data.name}</h3>
+                        <p>Тег: ${data.tag}</p>
+                        <p>Лидер: ${data.leader_name}</p>
+                        <p>Участников: ${data.members_count}</p>
+                        <p>Дата создания: ${new Date(data.created_at * 1000).toLocaleDateString()}</p>
+                        <h5>Участники:</h5>
+                        <ul>
+                            ${data.members.map(member => `
+                                <li>${member.nickname} - Роль: ${member.role}, Боев: ${member.battles}, Побед: ${member.wins} (${member.win_rate.toFixed(2)}%)</li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    clanInfo.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                document.getElementById('clanInfo').innerHTML = `<div class="alert alert-danger">Ошибка: ${error.message}</div>`;
+            });
     }
 
-    function getTankType(type) {
+    function getTankTypeName(type) {
         const types = {
-            'lightTank': 'Лёгкий танк',
-            'mediumTank': 'Средний танк',
-            'heavyTank': 'Тяжёлый танк',
+            'lightTank': 'Лёгкий',
+            'mediumTank': 'Средний',
+            'heavyTank': 'Тяжёлый',
             'AT-SPG': 'ПТ-САУ'
         };
         return types[type] || type;
@@ -307,176 +298,6 @@
         };
         return nations[nation] || nation;
     }
-
-    // ========== Поиск клана ==========
-    async function searchClan() {
-        const query = document.getElementById('clanSearchInput').value.trim();
-        if (!query) {
-            alert("Введите тег или название клана");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_URL}/clans/list/?application_id=${API_KEY}&search=${encodeURIComponent(query)}`);
-            const data = await response.json();
-
-            if (data.data && data.data.length > 0) {
-                displayClanList(data.data);
-            } else {
-                document.getElementById('clanList').innerHTML = '<div class="alert alert-warning">Кланы не найдены</div>';
-            }
-        } catch (error) {
-            console.error("Ошибка поиска кланов:", error);
-            document.getElementById('clanList').innerHTML = '<div class="alert alert-danger">Ошибка при поиске кланов</div>';
-        }
-    }
-
-    function displayClanList(clans) {
-        const clanList = document.getElementById('clanList');
-        clanList.innerHTML = '';
-
-        clans.slice(0, 20).forEach(clan => {
-            const clanItem = document.createElement('div');
-            clanItem.className = 'clan-item card mb-3';
-            clanItem.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${clan.name} [${clan.tag}]</h5>
-                    <p class="card-text">Членов: ${clan.members_count || 0}</p>
-                    <button class="btn btn-sm btn-primary view-clan" data-clan-id="${clan.clan_id}">
-                        Подробнее
-                    </button>
-                </div>
-            `;
-            clanList.appendChild(clanItem);
-        });
-
-        // Добавляем обработчики для кнопок "Подробнее"
-        document.querySelectorAll('.view-clan').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const clanId = e.target.getAttribute('data-clan-id');
-                getClanDetails(clanId);
-            });
-        });
-    }
-
-    async function getClanDetails(clanId) {
-        try {
-            // Загружаем основную информацию о клане
-            const clanResponse = await fetch(`${API_URL}/clans/info/?application_id=${API_KEY}&clan_id=${clanId}`);
-            const clanData = await clanResponse.json();
-
-            const clan = clanData.data[clanId];
-            const createdAt = new Date(clan.created_at * 1000).toLocaleDateString();
-
-            // Формируем HTML с основной информацией
-            let detailsHTML = `
-                <h3>${clan.name} [${clan.tag}]</h3>
-                <p><strong>Лидер:</strong> ${clan.leader_name}</p>
-                <p><strong>Членов:</strong> ${clan.members_count}</p>
-                <p><strong>Создан:</strong> ${createdAt}</p>
-            `;
-
-            // Добавляем требования вступления, если они есть
-            if (clan.recruiting_options) {
-                detailsHTML += `
-                    <div class="mt-4">
-                        <h4>Требования для вступления:</h4>
-                        <p><strong>Минимальный уровень техники:</strong> ${clan.recruiting_options.min_tier || 'Нет'}</p>
-                        <p><strong>Минимальное количество боёв:</strong> ${clan.recruiting_options.battles || 'Нет'}</p>
-                        <p><strong>Минимальный процент побед:</strong> ${clan.recruiting_options.wins_ratio ? clan.recruiting_options.wins_ratio + '%' : 'Нет'}</p>
-                        <p><strong>Доступность вступления:</strong> ${clan.recruiting_options.availability || 'Открыто'}</p>
-                    </div>
-                `;
-            }
-
-            // Добавляем список игроков
-            detailsHTML += `
-                <div class="mt-4">
-                    <h4>Состав клана (${clan.members_count} игроков)</h4>
-                    <div id="clanMembersList" class="mt-3"></div>
-                </div>
-            `;
-
-            const clanInfo = document.getElementById('clanInfo');
-            clanInfo.style.display = 'block';
-            clanInfo.querySelector('.card-body').innerHTML = detailsHTML;
-
-            // Загружаем статистику игроков клана
-            await loadClanMembersStats(clan.members, clanId);
-
-        } catch (error) {
-            console.error("Ошибка получения информации о клане:", error);
-            document.getElementById('clanInfo').innerHTML = '<div class="alert alert-danger">Ошибка загрузки информации о клане</div>';
-        }
-    }
-
-    async function loadClanMembersStats(members, clanId) {
-        try {
-            // Подготавливаем список ID игроков
-            const memberIds = members.map(m => m.account_id).join(',');
-
-            // Загружаем статистику всех игроков за один запрос
-            const statsResponse = await fetch(
-                `${API_URL}/account/info/?application_id=${API_KEY}&account_id=${memberIds}&fields=statistics.all`
-            );
-            const statsData = await statsResponse.json();
-
-            // Загружаем информацию о игроках (для получения никнеймов)
-            const accountsResponse = await fetch(
-                `${API_URL}/account/list/?application_id=${API_KEY}&account_id=${memberIds}`
-            );
-            const accountsData = await accountsResponse.json();
-
-            // Создаём карточки игроков
-            const membersList = document.getElementById('clanMembersList');
-            membersList.innerHTML = '';
-
-            members.forEach(member => {
-                const accountId = member.account_id;
-                const playerStats = statsData.data[accountId]?.statistics?.all || {};
-                const playerInfo = accountsData.data.find(a => a.account_id === accountId) || {};
-
-                const battles = playerStats.battles || 0;
-                const wins = playerStats.wins || 0;
-                const winRate = battles > 0 ? (wins / battles * 100).toFixed(2) : 0;
-
-                const memberCard = document.createElement('div');
-                memberCard.className = 'card mb-2';
-                memberCard.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title">${playerInfo.nickname || 'Неизвестный игрок'}</h5>
-                        <p class="card-text">
-                            <strong>Роль:</strong> ${getRoleName(member.role)}<br>
-                            <strong>Боев:</strong> ${battles}<br>
-                            <strong>Побед:</strong> ${winRate}%
-                        </p>
-                    </div>
-                `;
-                membersList.appendChild(memberCard);
-            });
-
-        } catch (error) {
-            console.error("Ошибка загрузки статистики игроков:", error);
-            document.getElementById('clanMembersList').innerHTML =
-                '<div class="alert alert-warning">Не удалось загрузить статистику игроков</div>';
-        }
-    }
-
-    // Вспомогательная функция для перевода ролей
-    function getRoleName(role) {
-        const roles = {
-            'commander': 'Командир',
-            'executive_officer': 'Зам. командира',
-            'personnel_officer': 'Офицер кадров',
-            'combat_officer': 'Боевой офицер',
-            'intelligence_officer': 'Офицер разведки',
-            'quartermaster': 'Квартирмейстер',
-            'recruit': 'Рекрут',
-            'private': 'Рядовой',
-            'reservist': 'Резервист'
-        };
-        return roles[role] || role;
-    }
 </script>
-</body>
-</html>
+{% endblock %}
+{% endblock %}
