@@ -30,6 +30,8 @@
                 <option value="uk">Великобритания</option>
                 <option value="china">Китай</option>
                 <option value="japan">Япония</option>
+                <option value="other">Сборная нация</option>
+                <option value="european">Сборная Европы</option>
             </select>
         </div>
         <div class="col-md-4">
@@ -192,8 +194,6 @@
                         <p>Уровень: ${data.tier}</p>
                         <p>Тип: ${getTankTypeName(data.type)}</p>
                         <p>Описание: ${data.description}</p>
-                        <p>Средний урон: ${data.avg_damage}</p>
-                        <p>Максимальное количество фрагов: ${data.max_frags}</p>
                     `;
                     tankInfo.style.display = 'block';
                 }
@@ -294,7 +294,9 @@
             'france': 'Франция',
             'uk': 'Великобритания',
             'china': 'Китай',
-            'japan': 'Япония'
+            'japan': 'Япония',
+            'other': 'Сборная нация',
+            'european': 'Сборная Европы'
         };
         return nations[nation] || nation;
     }
