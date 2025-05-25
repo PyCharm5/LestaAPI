@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import requests
 from config import Config
-import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -42,10 +41,10 @@ def auth():
 
 @app.route('/profile')
 def profile():
-    if 'access_token' not in session or 'account_id' not in session:
+    if 'access_token' not in session:
         return redirect(url_for('enter'))
 
-    stats = get_personal_player_stats(session['account_id'], session['access_token'])
+    stats = get_player_stats(session['account_id'])
     return render_template('profile.html', stats=stats)
 
 @app.route('/exit')
@@ -67,7 +66,7 @@ def search_player():
 
     if data.get('data'):
         account_id = data['data'][0]['account_id']
-        stats = get_public_player_stats(account_id)  # Используем публичную статистику
+        stats = get_player_stats(account_id)
         return jsonify(stats)
     return jsonify({'error': 'Игрок не найден'}), 404
 
@@ -194,8 +193,7 @@ def clan_details(clan_id):
         return jsonify({'error': str(e)}), 500
 
 # Вспомогательные функции
-def get_public_player_stats(account_id):
-    """Получает публичную статистику игрока (без персональных данных)"""
+def get_player_stats(account_id):
     response = requests.get(
         f"{app.config['API_URL']}/account/info/?application_id={app.config['API_KEY']}&account_id={account_id}&fields=statistics.all"
     )
@@ -210,54 +208,13 @@ def get_public_player_stats(account_id):
         'wins': wins,
         'win_rate': (wins / battles * 100) if battles > 0 else 0,
         'avg_damage': (stats.get('damage_dealt', 0) / battles) if battles > 0 else 0,
-        'max_frags': stats.get('max_frags', 0)
+        'max_frags': stats.get('max_frags', 0),
+        'ban_info': stats.get('ban_info', 'Нет информации о бане'),
+        'credits': stats.get('credits', 0),
+        'free_xp': stats.get('free_xp', 0),
+        'gold': stats.get('gold', 0),
+        'premium_expires_at': stats.get('premium_expires_at', 'Нет информации о премиуме')
     }
-
-def get_personal_player_stats(account_id, access_token):
-    """Получает персональные данные игрока (с использованием access_token)"""
-    try:
-        response = requests.get(
-            f"{app.config['API_URL']}/account/info/?application_id={app.config['API_KEY']}&account_id={account_id}&access_token={access_token}&fields=statistics.all,private"
-        )
-        data = response.json().get('data', {}).get(str(account_id), {})
-        stats = data.get('statistics', {}).get('all', {})
-        private = data.get('private', {})
-
-        battles = stats.get('battles', 0)
-        wins = stats.get('wins', 0)
-
-        # Форматирование даты премиума
-        premium_expires = private.get('premium_expires_at', 0)
-        if premium_expires and premium_expires > 0:
-            premium_date = datetime.datetime.fromtimestamp(premium_expires)
-            formatted_premium = premium_date.strftime("%d.%m.%Y %H:%M")
-        else:
-            formatted_premium = "Не активен"
-
-        return {
-            'battles': battles,
-            'wins': wins,
-            'win_rate': (wins / battles * 100) if battles > 0 else 0,
-            'avg_damage': (stats.get('damage_dealt', 0) / battles) if battles > 0 else 0,
-            'max_frags': stats.get('max_frags', 0),
-            'ban_info': stats.get('ban_info', 'Нет информации о бане'),
-            'credits': "{:,}".format(private.get('credits', 0)).replace(",", "."),
-            'free_xp': "{:,}".format(private.get('free_xp', 0)).replace(",", "."),
-            'gold': "{:,}".format(private.get('gold', 0)).replace(",", "."),
-            'premium_expires_at': formatted_premium
-        }
-    except Exception as e:
-        print(f"Error fetching personal stats: {e}")
-        public_stats = get_public_player_stats(account_id)
-        public_stats.update({
-            'ban_info': 'Ошибка получения данных',
-            'credits': "0",
-            'free_xp': "0",
-            'gold': "0",
-            'premium_expires_at': 'Ошибка получения данных'
-        })
-        return public_stats
-
 
 def filter_tanks(tanks, nation=None, tier=None, type_=None):
     filtered = []
@@ -277,4 +234,4 @@ def filter_tanks(tanks, nation=None, tier=None, type_=None):
     return filtered
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

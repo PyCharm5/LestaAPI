@@ -16,25 +16,6 @@
     {% else %}
         <h1 class="text-center mb-4">{{ session.nickname }}</h1>
 
-        <!-- Дополнительная информация в полоску -->
-        <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
-            <div class="badge bg-warning text-dark p-2">
-                <strong>Золото: {{ stats.gold }}</strong>
-            </div>
-            <div class="badge bg-secondary text-white p-2">
-                <strong>Кредиты: {{ stats.credits }}</strong>
-            </div>
-            <div class="badge bg-orange text-white p-2" style="background-color: #fd7e14 !important;">
-                <strong>Опыт: {{ stats.free_xp }}</strong>
-            </div>
-            <div class="badge {% if stats.ban_info != 'Нет информации о бане' %}bg-danger{% else %}bg-success{% endif %} text-white p-2">
-                <strong>Бан: {{ stats.ban_info }}</strong>
-            </div>
-            <div class="badge bg-info text-white p-2">
-                <strong>Премиум до: {{ stats.premium_expires_at }}</strong>
-            </div>
-        </div>
-
         <div class="row">
             <div class="col-md-6">
                 <div class="stat-card bg-light">
@@ -56,6 +37,21 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="stat-card bg-light">
+                    <h3>Дополнительная информация</h3>
+                    <div>
+                        <p>Информация о бане: <strong>{{ stats.ban_info }}</strong></p>
+                        <p>Кредиты: <strong>{{ stats.credits }}</strong></p>
+                        <p>Свободный опыт: <strong>{{ stats.free_xp }}</strong></p>
+                        <p>Золото: <strong>{{ stats.gold }}</strong></p>
+                        <p>Премиум до: <strong>{{ stats.premium_expires_at }}</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 </div>
 
@@ -65,9 +61,6 @@
         padding: 20px;
         margin-bottom: 20px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .bg-orange {
-        background-color: #fd7e14;
     }
 </style>
 {% endblock %}
