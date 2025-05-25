@@ -234,4 +234,4 @@ def filter_tanks(tanks, nation=None, tier=None, type_=None):
     return filtered
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    app.run(debug=False)
