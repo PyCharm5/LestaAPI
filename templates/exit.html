@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Выход{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <div class="alert alert-success">
+        <h3>Вы успешно вышли из системы</h3>
+        <p>Перенаправление на главную страницу...</p>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        window.location.href = "{{ url_for('index') }}";
+    }, 2000);
+</script>
+{% endblock %}

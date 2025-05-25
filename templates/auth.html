@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Обработка авторизации</title>
+    <script>
+        function getAuthData() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                access_token: params.get('access_token'),
+                account_id: params.get('account_id'),
+                nickname: params.get('nickname'),
+                expires_at: params.get('expires_at')
+            };
+        }
+
+        function sendAuthData() {
+            const authData = getAuthData();
+            if (authData && authData.access_token) {
+                alert(`Access Token: ${authData.access_token}`); // Вывод access_token в alert
+                // Здесь вы можете отправить данные на сервер, если это необходимо
+                fetch('/auth_callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(authData)
+                }).then(response => {
+                    if (response.ok) {
+                        window.opener.postMessage({ type: 'auth_complete' }, '*');
+                        window.close();
+                    } else {
+                        window.opener.postMessage({ type: 'auth_failed' }, '*');
+                        window.location.href = "/enter?error=auth_failed";
+                    }
+                });
+            } else {
+                window.opener.postMessage({ type: 'auth_failed' }, '*');
+                window.location.href = "/enter?error=no_token";
+            }
+        }
+
+        window.onload = sendAuthData;
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <h3>Завершение авторизации...</h3>
+        <p>Пожалуйста, подождите</p>
+    </div>
+</body>
+</html>
